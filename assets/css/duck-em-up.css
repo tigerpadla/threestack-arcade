@@ -1,8 +1,20 @@
 body {
+    background: url("../images/background.png");
     background-color: #3cbcfc;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    cursor: url("../images/target.png"), auto;
+}
+
+@font-face {
+    font-family: gameFont;
+    src: url("../fonts/duck-em-up-font.otf");
 }
 
 #score {
     font-size: 30px;
     color: white;
+    font-family: gameFont;
 }
