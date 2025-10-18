@@ -1,57 +1,116 @@
-window.addEventListener('load', function () {
-    console.log("Duck 'Em Up: script loaded");
+let ducks;
+let duckCount = 1;
+let duckImageNames = [
+    "assets/images/duck-left.gif",
+    "assets/images/duck-right.gif",
+];
+let duckWidth = 96;
+let duckHeight = 93;
+let duckVelocityX = 5;
+let duckVelocityY = 5;
 
-    const duck = document.createElement('img');
-    duck.src = 'assets/images/duck-right.gif';
-    duck.width = 96;
-    duck.height = 93;
-    duck.style.position = 'absolute';
-    duck.draggable = false;
+let gameWidth = window.innerWidth;
+let gameHeight = Math.floor((window.innerHeight * 3) / 4);
 
-    const gameWidth = window.innerWidth;
-    const gameHeight = Math.floor((window.innerHeight * 3) / 4);
+let score = 0;
 
-    function randomPosition(limit) {
-        return Math.floor(Math.random() * Math.max(1, limit));
-    }
+window.onload = function () {
+    setTimeout(addDucks, 1000);
+    setInterval(moveDucks, 1000 / 60);
+};
 
-    let x = randomPosition(gameWidth - duck.width);
-    let y = randomPosition(gameHeight - duck.height);
-    let velocityX = 4;
-    let velocityY = 3;
-    let score = 0;
+function addDucks() {
+    ducks = [];
+    duckCount = Math.floor(Math.random() * 2) + 1;
+    for (let i = 0; i < duckCount; i++) {
+        let duckImageName = duckImageNames[Math.floor(Math.random() * 2)];
+        let duckImage = document.createElement("img");
+        duckImage.src = duckImageName;
+        duckImage.width = duckWidth;
+        duckImage.height = duckHeight;
+        duckImage.draggable = false;
+        duckImage.style.position = "absolute";
 
-    duck.style.left = x + 'px';
-    duck.style.top = y + 'px';
-    document.body.appendChild(duck);
+        duckImage.onclick = function () {
+            let duckShotSound = new Audio("assets/sounds/duck-shot.mp3");
+            duckShotSound.play().catch(() => {});
+            score += 1;
+            const scoreEl = document.getElementById("score");
+            if (scoreEl) scoreEl.innerHTML = score;
+            document.body.removeChild(this);
 
-    duck.addEventListener('click', function () {
-        // play sound file when added
-        const s = new Audio('assets/sounds/duck-shot.mp3');
-        s.play().catch(() => {});
-        score += 1;
-        const scoreEl = document.getElementById('score');
-        if (scoreEl) scoreEl.textContent = String(score);
-        // remove duck
-        document.body.removeChild(duck);
-    });
+            let remaining_ducks = [];
+            for (let i = 0; i < ducks.length; i++) {
+                if (ducks[i].image !== this) remaining_ducks.push(ducks[i]);
+            }
+            ducks = remaining_ducks;
+            if (ducks.length == 0) addDog(duckCount);
+        };
+        document.body.appendChild(duckImage);
 
-    function loop() {
-        x += velocityX;
-        y += velocityY;
+        let duck = {
+            image: duckImage,
+            x: randomPosition(gameWidth - duckWidth),
+            y: randomPosition(gameHeight - duckHeight),
+            velocityX: duckVelocityX,
+            velocityY: duckVelocityY,
+        };
+        duck.image.style.left = String(duck.x) + "px";
+        duck.image.style.top = String(duck.y) + "px";
 
-        if (x < 0 || x + duck.width > gameWidth) {
-            velocityX *= -1;
-            duck.src = velocityX < 0 ? 'assets/images/duck-left.gif' : 'assets/images/duck-right.gif';
+        if (duck.image.src.includes(duckImageNames[0])) {
+            duck.velocityX = -duckVelocityX;
         }
-        if (y < 0 || y + duck.height > gameHeight) {
-            velocityY *= -1;
-        }
-
-        duck.style.left = x + 'px';
-        duck.style.top = y + 'px';
-        requestAnimationFrame(loop);
+        ducks.push(duck);
     }
+}
 
-    requestAnimationFrame(loop);
-});
+function moveDucks() {
+    if (!ducks) return;
+    for (let i = 0; i < ducks.length; i++) {
+        let duck = ducks[i];
+        duck.x += duck.velocityX;
+        if (duck.x < 0 || duck.x + duckWidth > gameWidth) {
+            duck.x -= duck.velocityX;
+            duck.velocityX *= -1;
+            if (duck.velocityX < 0) duck.image.src = duckImageNames[0];
+            else duck.image.src = duckImageNames[1];
+        }
+        duck.y += duck.velocityY;
+        if (duck.y < 0 || duck.y + duckHeight > gameHeight) {
+            duck.y -= duck.velocityY;
+            duck.velocityY *= -1;
+        }
+        duck.image.style.left = String(duck.x) + "px";
+        duck.image.style.top = String(duck.y) + "px";
+    }
+}
+
+function addDog(duckCount) {
+    let dogImage = document.createElement("img");
+    if (duckCount == 1) {
+        dogImage.src = "assets/images/dog-duck1.png";
+        dogImage.width = 172;
+    } else {
+        dogImage.src = "assets/images/dog-duck2.png";
+        dogImage.width = 224;
+    }
+    dogImage.height = 152;
+    dogImage.draggable = false;
+    dogImage.style.position = "fixed";
+    dogImage.style.bottom = "0px";
+    dogImage.style.left = "50%";
+    document.body.appendChild(dogImage);
+
+    let dogScoreSound = new Audio("assets/sounds/dog-score.mp3");
+    dogScoreSound.play().catch(() => {});
+
+    setTimeout(function () {
+        document.body.removeChild(dogImage);
+        addDucks();
+    }, 5000);
+}
+
+function randomPosition(limit) {
+    return Math.floor(Math.random() * Math.max(1, limit));
+}
