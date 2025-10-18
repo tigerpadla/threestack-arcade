@@ -19,10 +19,22 @@ window.addEventListener('load', function () {
     let y = randomPosition(gameHeight - duck.height);
     let velocityX = 4;
     let velocityY = 3;
+    let score = 0;
 
     duck.style.left = x + 'px';
     duck.style.top = y + 'px';
     document.body.appendChild(duck);
+
+    duck.addEventListener('click', function () {
+        // play sound file when added
+        const s = new Audio('assets/sounds/duck-shot.mp3');
+        s.play().catch(() => {});
+        score += 1;
+        const scoreEl = document.getElementById('score');
+        if (scoreEl) scoreEl.textContent = String(score);
+        // remove duck
+        document.body.removeChild(duck);
+    });
 
     function loop() {
         x += velocityX;
