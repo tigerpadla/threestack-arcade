@@ -1,11 +1,15 @@
 body {
-    background: url("../images/background.png");
+    background: url("../images/duck-em-up-background.png");
     background-color: #3cbcfc;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
-    cursor: url("../images/target.png"), auto;
+    cursor: url("../images/duck-em-up-target.png"), auto;
+    margin: 0;
+    padding-top: calc(
+        var(--scoreboard-icon-width) * 0.65 + var(--scoreboard-padding-y) * 2
+    );
 }
 
 @font-face {
@@ -14,21 +18,61 @@ body {
 }
 
 #score {
-    font-size: 30px;
+    font-size: clamp(32px, 9vw, 56px);
     font-family: gameFont;
     color: white;
+    margin: 0;
+    text-align: center;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
 
     user-select: none;
-    -webkit-user-select: none; /* Chrome, Opera */
-    -webkit-touch-callout: none; /* Safari */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 img {
     user-select: none;
-    -webkit-user-select: none; /* Chrome, Opera */
-    -webkit-touch-callout: none; /* Safari */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+:root {
+    --scoreboard-padding-y: clamp(12px, 2vw, 28px);
+    --scoreboard-icon-width: clamp(200px, 32vw, 320px);
+}
+
+.scoreboard {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding: var(--scoreboard-padding-y) 0;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.scoreboard__icon {
+    position: relative;
+    width: var(--scoreboard-icon-width);
+    max-width: 90vw;
+}
+
+.scoreboard__icon img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.scoreboard__icon #score {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -90%);
+    pointer-events: auto;
 }
