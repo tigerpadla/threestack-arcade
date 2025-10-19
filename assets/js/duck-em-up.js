@@ -99,6 +99,7 @@ function moveDucks() {
 
 function addDog(duckCount) {
     let dogImage = document.createElement("img");
+    dogImage.classList.add("dog-popup");
     if (duckCount == 1) {
         dogImage.src = "assets/images/dog-duck1.png";
         dogImage.width = 172;
