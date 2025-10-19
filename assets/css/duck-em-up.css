@@ -18,7 +18,7 @@ body {
 }
 
 #score {
-    font-size: clamp(32px, 9vw, 56px);
+    font-size: clamp(20px, 5.2vw, 32px);
     font-family: gameFont;
     color: white;
     margin: 0;
@@ -41,8 +41,8 @@ img {
 }
 
 :root {
-    --scoreboard-padding-y: clamp(12px, 2vw, 28px);
-    --scoreboard-icon-width: clamp(200px, 32vw, 320px);
+    --scoreboard-padding-y: clamp(6px, 0.9vw, 14px);
+    --scoreboard-icon-width: clamp(120px, 18vw, 200px);
 }
 
 .scoreboard {
