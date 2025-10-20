@@ -101,6 +101,10 @@ img {
     }
 }
 
+.duck-shot-image {
+    transform: scale(1.18);
+}
+
 *,
 *::before,
 *::after {

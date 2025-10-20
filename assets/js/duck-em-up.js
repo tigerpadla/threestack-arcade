@@ -4,8 +4,8 @@ let duckImageNames = [
     "assets/images/duck-left.gif",
     "assets/images/duck-right.gif",
 ];
-let duckWidth = 96;
-let duckHeight = 93;
+let duckWidth = 120;
+let duckHeight = 116;
 let duckVelocityX = 5;
 let duckVelocityY = 5;
 
@@ -34,24 +34,32 @@ function addDucks() {
         //document.body.appendChild(duckImage);
 
         duckImage.onclick = function () {
+            if (this.dataset.shot === "true") {
+                return;
+            }
+            this.dataset.shot = "true";
+            this.onclick = null;
+
             let duckShotSound = new Audio("assets/sounds/duck-shot.mp3");
             duckShotSound.play();
             score += 1;
             document.getElementById("score").innerHTML = score;
-            document.body.removeChild(this);
 
-            // Remove this duck from array
-            let remaining_ducks = [];
-            for (let i = 0; i < ducks.length; i++) {
-                if (ducks[i].image !== this) {
-                    remaining_ducks.push(ducks[i]);
+            const originalSrc = this.src;
+            this.classList.add("duck-shot-image");
+            this.src = "assets/images/duck-shot.png";
+
+            setTimeout(() => {
+                if (this.parentElement) {
+                    this.parentElement.removeChild(this);
                 }
-            }
-
-            ducks = remaining_ducks;
-            if (ducks.length == 0) {
-                addDog(duckCount);
-            }
+                ducks = ducks.filter((duckEntry) => duckEntry.image !== this);
+                if (ducks.length === 0) {
+                    addDog(duckCount);
+                }
+                this.classList.remove("duck-shot-image");
+                this.src = originalSrc;
+            }, 1000);
         };
         document.body.appendChild(duckImage);
 
@@ -77,6 +85,9 @@ function addDucks() {
 function moveDucks() {
     for (let i = 0; i < ducks.length; i++) {
         let duck = ducks[i];
+        if (duck.image.dataset.shot === "true") {
+            continue;
+        }
         duck.x += duck.velocityX;
         if (duck.x < 0 || duck.x + duckWidth > gameWidth) {
             duck.x -= duck.velocityX;
@@ -102,16 +113,16 @@ function addDog(duckCount) {
     dogImage.classList.add("dog-popup");
     if (duckCount === 1) {
         dogImage.src = "assets/images/dog-duck1.png";
-        dogImage.width = 172;
-        dogImage.height = 152;
+        dogImage.width = 230;
+        dogImage.height = 204;
     } else if (duckCount === 2) {
         dogImage.src = "assets/images/dog-duck2.png";
-        dogImage.width = 224;
-        dogImage.height = 152;
+        dogImage.width = 296;
+        dogImage.height = 204;
     } else {
         dogImage.src = "assets/images/dog-duck3.png";
-        dogImage.width = 276;
-        dogImage.height = 196; // taller to keep the sprite proportional
+        dogImage.width = 368;
+        dogImage.height = 264;
     }
     dogImage.draggable = false;
 
