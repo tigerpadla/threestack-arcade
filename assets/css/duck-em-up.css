@@ -86,7 +86,7 @@ img {
     bottom: 0;
     left: 50%;
     transform: translate(-50%, 100%);
-    animation: dog-pop 5s ease-in-out forwards;
+    animation: dog-pop 2.2s ease-in-out forwards;
     pointer-events: none;
 }
 

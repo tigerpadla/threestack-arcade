@@ -176,7 +176,7 @@ function addDog(duckCount) {
     setTimeout(function () {
         document.body.removeChild(dogImage);
         addDucks();
-    }, 5000); // 5000ms = 5 seconds
+    }, 3000);
 }
 
 function randomPosition(limit) {
