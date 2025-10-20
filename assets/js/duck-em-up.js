@@ -30,15 +30,25 @@ function addDucks() {
         duckImage.width = duckWidth;
         duckImage.height = duckHeight;
         duckImage.draggable = false;
-        duckImage.style.position = "absolute"; // Allows tag to be placed in exact location
-        //document.body.appendChild(duckImage);
+        duckImage.style.position = "absolute";
+        duckImage.dataset.state = "flying";
 
         duckImage.onclick = function () {
-            if (this.dataset.shot === "true") {
+            if (
+                this.dataset.state === "shot" ||
+                this.dataset.state === "falling"
+            ) {
                 return;
             }
-            this.dataset.shot = "true";
-            this.onclick = null;
+            const duckEntry = ducks.find((entry) => entry.image === this);
+            if (!duckEntry) {
+                return;
+            }
+
+            this.dataset.state = "shot";
+            duckEntry.state = "shot";
+            duckEntry.velocityX = 0;
+            duckEntry.velocityY = 0;
 
             let duckShotSound = new Audio("assets/sounds/duck-shot.mp3");
             duckShotSound.play();
@@ -50,27 +60,31 @@ function addDucks() {
             this.src = "assets/images/duck-shot.png";
 
             setTimeout(() => {
-                if (this.parentElement) {
-                    this.parentElement.removeChild(this);
-                }
-                ducks = ducks.filter((duckEntry) => duckEntry.image !== this);
-                if (ducks.length === 0) {
-                    addDog(duckCount);
+                if (!duckEntry.image.parentElement) {
+                    return;
                 }
                 this.classList.remove("duck-shot-image");
-                this.src = originalSrc;
+                this.src = "assets/images/duck-fall.gif";
+                this.dataset.state = "falling";
+
+                duckEntry.state = "falling";
+                duckEntry.fallVelocity = 6;
+                duckEntry.maxFallVelocity = 20;
+                duckEntry.gravity = 0.9;
             }, 1000);
         };
         document.body.appendChild(duckImage);
 
         let duck = {
             image: duckImage,
-            // x: 100,
-            // y: 50,
             x: randomPosition(gameWidth - duckWidth),
             y: randomPosition(gameHeight - duckHeight),
-            velocityX: duckVelocityX, // Default positive x move right
+            velocityX: duckVelocityX,
             velocityY: duckVelocityY,
+            state: "flying",
+            fallVelocity: 0,
+            maxFallVelocity: 0,
+            gravity: 0,
         };
         duck.image.style.left = String(duck.x) + "px"; // X position
         duck.image.style.top = String(duck.y) + "px"; // Y position
@@ -83,28 +97,53 @@ function addDucks() {
 }
 
 function moveDucks() {
-    for (let i = 0; i < ducks.length; i++) {
+    for (let i = ducks.length - 1; i >= 0; i--) {
         let duck = ducks[i];
-        if (duck.image.dataset.shot === "true") {
+
+        if (duck.state === "shot") {
             continue;
         }
+
+        if (duck.state === "falling") {
+            duck.fallVelocity = Math.min(
+                (duck.fallVelocity || 0) + (duck.gravity || 0),
+                duck.maxFallVelocity || 20
+            );
+            duck.y += duck.fallVelocity;
+
+            if (duck.y >= gameHeight - duckHeight) {
+                duck.y = gameHeight - duckHeight;
+                duck.image.style.top = `${duck.y}px`;
+
+                if (duck.image.parentElement) {
+                    duck.image.parentElement.removeChild(duck.image);
+                }
+                ducks.splice(i, 1);
+
+                if (ducks.length === 0) {
+                    addDog(duckCount);
+                }
+                continue;
+            }
+
+            duck.image.style.top = `${duck.y}px`;
+            continue;
+        }
+
         duck.x += duck.velocityX;
         if (duck.x < 0 || duck.x + duckWidth > gameWidth) {
             duck.x -= duck.velocityX;
             duck.velocityX *= -1;
-            if (duck.velocityX < 0) {
-                duck.image.src = duckImageNames[0]; // Left
-            } else {
-                duck.image.src = duckImageNames[1]; // Right
-            }
+            duck.image.src =
+                duck.velocityX < 0 ? duckImageNames[0] : duckImageNames[1];
         }
         duck.y += duck.velocityY;
         if (duck.y < 0 || duck.y + duckHeight > gameHeight) {
             duck.y -= duck.velocityY;
             duck.velocityY *= -1;
         }
-        duck.image.style.left = String(duck.x) + "px";
-        duck.image.style.top = String(duck.y) + "px";
+        duck.image.style.left = `${duck.x}px`;
+        duck.image.style.top = `${duck.y}px`;
     }
 }
 
