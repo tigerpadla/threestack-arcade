@@ -1,3 +1,8 @@
+html,
+body {
+    cursor: url("../images/duck-em-up-target.png"), auto;
+}
+
 body {
     background: url("../images/duck-em-up-background.png");
     background-color: #3cbcfc;
@@ -5,7 +10,6 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
-    cursor: url("../images/duck-em-up-target.png"), auto;
     margin: 0;
     padding-top: calc(
         var(--scoreboard-icon-width) * 0.65 + var(--scoreboard-padding-y) * 2
@@ -95,4 +99,10 @@ img {
     80% {
         transform: translate(-50%, 0);
     }
+}
+
+*,
+*::before,
+*::after {
+    cursor: url("../images/duck-em-up-target.png"), auto !important;
 }
