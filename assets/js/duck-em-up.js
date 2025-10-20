@@ -13,6 +13,37 @@ let gameWidth = window.screen.width;
 let gameHeight = (window.screen.height * 3) / 4;
 
 let score = 0;
+let quackTimer = null;
+
+function randomDelay(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function startQuackLoop() {
+    if (quackTimer || !ducks || ducks.length === 0) {
+        return;
+    }
+
+    quackTimer = setTimeout(() => {
+        quackTimer = null;
+
+        const flyingDucks = ducks.filter((duck) => duck.state === "flying");
+        if (flyingDucks.length > 0) {
+            new Audio("assets/sounds/duck-quack.mp3").play();
+        }
+
+        if (ducks.length > 0) {
+            startQuackLoop();
+        }
+    }, randomDelay(2500, 5000));
+}
+
+function stopQuackLoop() {
+    if (quackTimer) {
+        clearTimeout(quackTimer);
+        quackTimer = null;
+    }
+}
 
 window.onload = function () {
     // addDucks();
@@ -71,6 +102,9 @@ function addDucks() {
                 duckEntry.fallVelocity = 6;
                 duckEntry.maxFallVelocity = 20;
                 duckEntry.gravity = 0.9;
+                duckEntry.fallAudio = new Audio("assets/sounds/duck-fall.mp3");
+                duckEntry.fallAudio.loop = true;
+                duckEntry.fallAudio.play();
             }, 1000);
         };
         document.body.appendChild(duckImage);
@@ -85,6 +119,7 @@ function addDucks() {
             fallVelocity: 0,
             maxFallVelocity: 0,
             gravity: 0,
+            fallAudio: null,
         };
         duck.image.style.left = String(duck.x) + "px"; // X position
         duck.image.style.top = String(duck.y) + "px"; // Y position
@@ -94,6 +129,7 @@ function addDucks() {
         }
         ducks.push(duck);
     }
+    startQuackLoop();
 }
 
 function moveDucks() {
@@ -115,12 +151,20 @@ function moveDucks() {
                 duck.y = gameHeight - duckHeight;
                 duck.image.style.top = `${duck.y}px`;
 
+                if (duck.fallAudio) {
+                    duck.fallAudio.pause();
+                    duck.fallAudio.currentTime = 0;
+                    duck.fallAudio = null;
+                }
+                new Audio("assets/sounds/duck-land.mp3").play();
+
                 if (duck.image.parentElement) {
                     duck.image.parentElement.removeChild(duck.image);
                 }
                 ducks.splice(i, 1);
 
                 if (ducks.length === 0) {
+                    stopQuackLoop();
                     addDog(duckCount);
                 }
                 continue;
