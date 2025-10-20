@@ -22,7 +22,7 @@ window.onload = function () {
 
 function addDucks() {
     ducks = [];
-    duckCount = Math.floor(Math.random() * 2) + 1;
+    duckCount = Math.floor(Math.random() * 3) + 1;
     for (let i = 0; i < duckCount; i++) {
         let duckImageName = duckImageNames[Math.floor(Math.random() * 2)];
         let duckImage = document.createElement("img");
@@ -100,15 +100,19 @@ function moveDucks() {
 function addDog(duckCount) {
     let dogImage = document.createElement("img");
     dogImage.classList.add("dog-popup");
-    if (duckCount == 1) {
+    if (duckCount === 1) {
         dogImage.src = "assets/images/dog-duck1.png";
         dogImage.width = 172;
-    } else {
-        //2
+        dogImage.height = 152;
+    } else if (duckCount === 2) {
         dogImage.src = "assets/images/dog-duck2.png";
         dogImage.width = 224;
+        dogImage.height = 152;
+    } else {
+        dogImage.src = "assets/images/dog-duck3.png";
+        dogImage.width = 276;
+        dogImage.height = 196; // taller to keep the sprite proportional
     }
-    dogImage.height = 152;
     dogImage.draggable = false;
 
     dogImage.style.position = "fixed"; // Stay in same place even when scrolling
