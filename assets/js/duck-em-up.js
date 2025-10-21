@@ -245,41 +245,55 @@ function addDucks() {
             score += 1;
             document.getElementById("score").innerHTML = score;
 
-            // Immediately set clicked duck to falling (no intermediate 'shot' delay)
-            this.dataset.state = "falling";
-            duckEntry.state = "falling";
-            // stop horizontal motion
+            // Show "shot" image briefly before falling
+            // Set state to 'shot' and apply visual class
+            this.dataset.state = "shot";
+            duckEntry.state = "shot";
+            this.classList.add("duck-shot-image");
+            // immediately show the static shot image
+            this.src = "assets/images/duck-shot.png";
+            // stop horizontal motion immediately
             duckEntry.velocityX = 0;
             duckEntry.velocityY = 0;
 
-            // initialize falling physics & play fall audio
-            duckEntry.fallVelocity = 6;
-            duckEntry.maxFallVelocity = 20;
-            duckEntry.gravity = 0.9;
-            duckEntry.fallAudio = new Audio("assets/sounds/duck-fall.mp3");
-            duckEntry.fallAudio.loop = true;
-            duckEntry.fallAudio.play();
+            // after a short delay, transition to falling (same as previous falling logic)
+            setTimeout(() => {
+                // ensure duck still exists and is in 'shot' state
+                if (!duckEntry || duckEntry.state !== "shot") return;
 
-            // set fall image immediately
-            this.classList.remove("duck-shot-image");
-            this.src = "assets/images/duck-fall.gif";
+                // transition to falling
+                this.dataset.state = "falling";
+                duckEntry.state = "falling";
 
-            // If bullets ran out and there are still flying ducks, make them fly away
-            const flyingDucks = ducks.filter((d) => d.state === "flying");
-            if (bullets === 0 && flyingDucks.length > 0) {
-                roundEndedWithLaugh = true;
-                flyingDucks.forEach((d) => {
-                    d.state = "flyingAway";
-                    d.velocityY = -10;
-                    d.velocityX = (d.velocityX || 0) * 0.2;
+                // initialize falling physics & play fall audio
+                duckEntry.fallVelocity = 6;
+                duckEntry.maxFallVelocity = 20;
+                duckEntry.gravity = 0.9;
+                duckEntry.fallAudio = new Audio("assets/sounds/duck-fall.mp3");
+                duckEntry.fallAudio.loop = true;
+                duckEntry.fallAudio.play();
 
-                    // count misses immediately for each fleeing duck
-                    missesThisLevel = (missesThisLevel || 0) + 1;
-                });
-                updateUI(); // update hearts right away
-                stopQuackLoop();
-                return;
-            }
+                // set fall image immediately and remove shot-image class
+                this.classList.remove("duck-shot-image");
+                this.src = "assets/images/duck-fall.gif";
+
+                // If bullets ran out and there are still flying ducks, make them fly away
+                const flyingDucks = ducks.filter((d) => d.state === "flying");
+                if (bullets === 0 && flyingDucks.length > 0) {
+                    roundEndedWithLaugh = true;
+                    flyingDucks.forEach((d) => {
+                        d.state = "flyingAway";
+                        d.velocityY = -10;
+                        d.velocityX = (d.velocityX || 0) * 0.2;
+
+                        // count misses immediately for each fleeing duck
+                        missesThisLevel = (missesThisLevel || 0) + 1;
+                    });
+                    updateUI(); // update hearts right away
+                    stopQuackLoop();
+                    return;
+                }
+            }, 200);
         };
         document.body.appendChild(duckImage);
 
