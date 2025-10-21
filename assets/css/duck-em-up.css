@@ -217,6 +217,42 @@ img {
     }
 }
 
+/* restart button */
+.level-announcement__content .game-over-button,
+.game-over-button {
+    /* retro pixel button */
+    margin-top: 12px;
+    padding: 6px 14px;
+    font-family: gameFont, monospace;
+    font-size: clamp(12px, 2.6vw, 18px);
+    color: #111; /* dark text on light button */
+    background: linear-gradient(#ffd966, #ffb300); /* simple two-tone */
+    border: 4px solid #111; /* thick dark border */
+    border-bottom-width: 8px; /* extra thickness to look 3D */
+    border-right-width: 8px;
+    border-radius: 4px;
+    box-shadow: 0 8px 0 #000, inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    pointer-events: auto;
+    image-rendering: pixelated; /* keep crisp edges on scaled displays */
+    transition: transform 60ms linear, box-shadow 60ms linear;
+}
+
+/* pressed effect */
+.game-over-button:active {
+    transform: translateY(6px);
+    box-shadow: 0 2px 0 #000;
+    border-bottom-width: 4px;
+    border-right-width: 4px;
+}
+
+/* hover/focus keep simple contrast change */
+.game-over-button:hover,
+.game-over-button:focus {
+    filter: brightness(1.05);
+    outline: none;
+}
+
 *,
 *::before,
 *::after {

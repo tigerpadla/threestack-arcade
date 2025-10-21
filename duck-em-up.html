@@ -36,6 +36,24 @@
         </div>
     </div>
 
+    <!-- game over announcement overlay (same visual style; includes Restart) -->
+    <div id="game-over-announcement" class="level-announcement hidden" aria-live="polite" role="alert">
+        <div class="level-announcement__content">
+            <h1 id="game-over-text">Game Over</h1>
+            <p class="subtext">Click Restart to play again</p>
+            <button id="game-over-restart" class="game-over-button" type="button">Restart</button>
+        </div>
+    </div>
+
+    <!-- game complete announcement overlay (shows final score briefly) -->
+    <div id="game-complete-announcement" class="level-announcement hidden" aria-live="polite" role="status">
+        <div class="level-announcement__content">
+            <h1 id="game-complete-text">Congrats! You've Ducked 'Em Up! All ducks down!</h1>
+            <p class="subtext">Your Score: <span id="final-score">0</span></p>
+            <button id="game-complete-play" class="game-over-button" type="button">Play Again</button>
+        </div>
+    </div>
+
     <main>
         <!-- place main content here -->
     </main>

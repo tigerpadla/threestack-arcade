@@ -436,27 +436,47 @@ function endRound() {
 }
 
 function gameOver() {
-    alert("Game Over — too many misses this level.");
-    currentLevel = 1;
-    currentRound = 1;
-    missesThisLevel = 0;
-    score = 0;
-    bullets = 0;
-    roundEndedWithLaugh = false;
-    updateUI();
-    setTimeout(startRound, 1000);
+    // show Game Over overlay and let player restart manually
+    showGameOverAnnouncement();
 }
 
 function gameComplete() {
-    alert("Congratulations — you completed all levels!");
-    currentLevel = 1;
-    currentRound = 1;
-    missesThisLevel = 0;
-    score = 0;
-    bullets = 0;
-    roundEndedWithLaugh = false;
-    updateUI();
-    setTimeout(startRound, 1000);
+    // show a brief "Congrats" announcement with final score, then restart game
+    showGameCompleteAnnouncement();
+}
+
+// new: show game-complete announcement and wait for player to restart via button
+function showGameCompleteAnnouncement() {
+    const overlay = document.getElementById("game-complete-announcement");
+    const scoreEl = document.getElementById("final-score");
+    const playBtn = document.getElementById("game-complete-play");
+
+    if (!overlay) {
+        // fallback: reset game if overlay missing
+        currentLevel = 1;
+        currentRound = 1;
+        missesThisLevel = 0;
+        score = 0;
+        bullets = 0;
+        roundEndedWithLaugh = false;
+        updateUI();
+        setTimeout(startRound, 500);
+        return;
+    }
+
+    // update score text and show overlay (do NOT auto-hide)
+    if (scoreEl) scoreEl.textContent = String(score);
+    overlay.classList.remove("hidden");
+
+    // ensure single handler: replace node to remove any previous listeners, then attach reload
+    if (playBtn) {
+        const newBtn = playBtn.cloneNode(true);
+        playBtn.parentNode.replaceChild(newBtn, playBtn);
+        newBtn.addEventListener("click", () => {
+            // reload the page to restart the game
+            window.location.reload();
+        });
+    }
 }
 
 function addDog(duckCount) {
@@ -531,3 +551,22 @@ function randomPosition(limit) {
 
 // ensure UI initialised
 window.addEventListener("load", updateUI);
+
+// new: show game-over announcement and hook restart button
+function showGameOverAnnouncement() {
+    const overlay = document.getElementById("game-over-announcement");
+    const restartBtn = document.getElementById("game-over-restart");
+    if (!overlay) return;
+
+    overlay.classList.remove("hidden");
+
+    // ensure single handler: replace with a fresh node then attach simple reload
+    if (restartBtn) {
+        const newBtn = restartBtn.cloneNode(true);
+        restartBtn.parentNode.replaceChild(newBtn, restartBtn);
+        newBtn.addEventListener("click", () => {
+            // reload the page to restart the game
+            window.location.reload();
+        });
+    }
+}
