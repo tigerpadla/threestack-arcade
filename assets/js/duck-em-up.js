@@ -19,6 +19,25 @@ let quackTimer = null;
 let bullets = 0;
 let roundEndedWithLaugh = false;
 
+// --- new: level/round state ---
+let currentLevel = 1;
+let currentRound = 1;
+const roundsPerLevel = 3;
+const maxLevels = 5;
+let missesThisLevel = 0;
+
+// level settings: min, max, speed multiplier (applied to base velocities)
+const levelSettings = [
+    /* level 1 */ { min: 1, max: 3, speed: 1 }, // Normal
+    /* level 2 */ { min: 2, max: 5, speed: 1 }, // Normal
+    /* level 3 */ { min: 3, max: 7, speed: 1.2 }, // Slower Fast
+    /* level 4 */ { min: 5, max: 8, speed: 1.4 }, // Slower Fast+
+    /* level 5 */ { min: 8, max: 10, speed: 1.6 }, // Slower Very Fast
+];
+
+const baseVelocityX = 5;
+const baseVelocityY = 5;
+
 function randomDelay(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -49,9 +68,36 @@ function stopQuackLoop() {
     }
 }
 
+// new: show level announcement then call callback
+function showLevelAnnouncement(level, cb) {
+    const overlay = document.getElementById("level-announcement");
+    const text = document.getElementById("announcement-text");
+    if (!overlay || !text) {
+        if (typeof cb === "function") cb();
+        return;
+    }
+    text.textContent = `Level ${level}`;
+    overlay.classList.remove("hidden");
+    // keep visible for 1800ms, then hide and call callback
+    setTimeout(() => {
+        overlay.classList.add("hidden");
+        if (typeof cb === "function") cb();
+    }, 1800);
+}
+
+// new: startRound handles showing level announcement at start of a level (round 1)
+function startRound() {
+    updateUI();
+    if (currentRound === 1) {
+        showLevelAnnouncement(currentLevel, addDucks);
+    } else {
+        addDucks();
+    }
+}
+
 window.onload = function () {
-    // addDucks();
-    setTimeout(addDucks, 2000); // Wait 2 seconds
+    // replace initial addDucks with startRound so announcement shows on first level
+    setTimeout(startRound, 2000); // Wait 2 seconds and then announce/start
     setInterval(moveDucks, 1000 / 60); // 60 frames per second
 
     // Miss-click handler: clicking anywhere that's not a duck consumes a bullet
@@ -92,22 +138,67 @@ window.onload = function () {
                     d.velocityY = -10;
                     // optionally reduce horizontal movement while fleeing upward
                     d.velocityX = d.velocityX * 0.2;
+
+                    // count this duck as missed immediately so hearts disappear now
+                    missesThisLevel = (missesThisLevel || 0) + 1;
                 }
             });
+            updateUI(); // reflect missed hearts immediately
             stopQuackLoop();
         }
     });
 };
 
+function updateUI() {
+    const scoreEl = document.getElementById("score");
+    const missesContainer = document.getElementById("misses");
+
+    // update score
+    if (scoreEl) scoreEl.textContent = score;
+
+    // dynamic miss limit: levels 1-2 -> 3 misses, levels 3+ -> 5 misses
+    const missLimit = currentLevel >= 3 ? 5 : 3;
+    // remaining hearts = missLimit - missesThisLevel (clamped >= 0)
+    const remaining = Math.max(0, missLimit - (missesThisLevel || 0));
+
+    // render heart icons
+    if (missesContainer) {
+        missesContainer.innerHTML = "";
+        for (let i = 0; i < remaining; i++) {
+            const img = document.createElement("img");
+            img.className = "heart-icon";
+            img.src = "assets/images/duck-red-icon.png";
+            img.alt = "Life";
+            img.draggable = false;
+            missesContainer.appendChild(img);
+        }
+    }
+    renderBullets(); // refresh bullets too
+}
+
 function addDucks() {
     ducks = [];
-    duckCount = Math.floor(Math.random() * 3) + 1;
+
+    // pick settings for current level
+    const settings =
+        levelSettings[
+            Math.max(0, Math.min(levelSettings.length - 1, currentLevel - 1))
+        ];
+    // random duck count based on level
+    duckCount =
+        Math.floor(Math.random() * (settings.max - settings.min + 1)) +
+        settings.min;
 
     // bullets = duckCount + 1
     bullets = duckCount + 1;
-    // reset round flag when starting a new round
+    // reset round-ended flag when starting/continuing rounds
     roundEndedWithLaugh = false;
+    // apply speed multipliers
+    duckVelocityX = baseVelocityX * settings.speed;
+    duckVelocityY = baseVelocityY * settings.speed;
+
     renderBullets();
+    updateUI();
 
     for (let i = 0; i < duckCount; i++) {
         let duckImageName = duckImageNames[Math.floor(Math.random() * 2)];
@@ -175,7 +266,11 @@ function addDucks() {
                     d.state = "flyingAway";
                     d.velocityY = -10;
                     d.velocityX = (d.velocityX || 0) * 0.2;
+
+                    // count misses immediately for each fleeing duck
+                    missesThisLevel = (missesThisLevel || 0) + 1;
                 });
+                updateUI(); // update hearts right away
                 stopQuackLoop();
                 return;
             }
@@ -239,15 +334,8 @@ function moveDucks() {
                 ducks.splice(i, 1);
 
                 if (ducks.length === 0) {
-                    stopQuackLoop();
-                    // respect roundEndedWithLaugh: show laughing dog if bullets ran out,
-                    // otherwise show normal dog popup
-                    if (roundEndedWithLaugh) {
-                        addDogLaugh();
-                        roundEndedWithLaugh = false;
-                    } else {
-                        addDog(duckCount);
-                    }
+                    endRound();
+                    roundEndedWithLaugh = false;
                 }
                 continue;
             }
@@ -271,21 +359,16 @@ function moveDucks() {
 
             // if duck has flown beyond the top of the game area, remove it
             if (duck.y + duckHeight < 0) {
+                // removal only — miss was already counted when duck began flying away
                 if (duck.image.parentElement) {
                     duck.image.parentElement.removeChild(duck.image);
                 }
                 ducks.splice(i, 1);
 
-                // when last duck removed decide which popup to show
+                // when last duck removed decide next action
                 if (ducks.length === 0) {
-                    if (roundEndedWithLaugh) {
-                        stopQuackLoop();
-                        addDogLaugh();
-                        roundEndedWithLaugh = false;
-                    } else {
-                        stopQuackLoop();
-                        addDog(duckCount);
-                    }
+                    endRound();
+                    roundEndedWithLaugh = false;
                 }
             }
             continue;
@@ -308,6 +391,74 @@ function moveDucks() {
     }
 }
 
+// replace direct calls to addDog/addDogLaugh when ducks run out with centralized endRound()
+function endRound() {
+    stopQuackLoop();
+
+    // show appropriate popup
+    if (roundEndedWithLaugh) {
+        addDogLaugh();
+    } else {
+        addDog(duckCount);
+    }
+
+    // after popup delay, decide next action
+    setTimeout(() => {
+        // dynamic miss limit: levels 1-2 -> 3 misses, levels 3+ -> 5 misses
+        const missLimit = currentLevel >= 3 ? 5 : 3;
+
+        // if player missed missLimit or more ducks in this level -> game over
+        if (missesThisLevel >= missLimit) {
+            gameOver();
+            return;
+        }
+
+        // advance round or level
+        if (currentRound < roundsPerLevel) {
+            currentRound++;
+        } else {
+            // finished this level
+            if (currentLevel < maxLevels) {
+                currentLevel++;
+            } else {
+                // completed all levels
+                gameComplete();
+                return;
+            }
+            // reset rounds/misses for new level
+            currentRound = 1;
+            missesThisLevel = 0;
+        }
+        updateUI();
+        // start next round via startRound() so level announcement runs when needed
+        startRound();
+    }, 3000);
+}
+
+function gameOver() {
+    alert("Game Over — too many misses this level.");
+    currentLevel = 1;
+    currentRound = 1;
+    missesThisLevel = 0;
+    score = 0;
+    bullets = 0;
+    roundEndedWithLaugh = false;
+    updateUI();
+    setTimeout(startRound, 1000);
+}
+
+function gameComplete() {
+    alert("Congratulations — you completed all levels!");
+    currentLevel = 1;
+    currentRound = 1;
+    missesThisLevel = 0;
+    score = 0;
+    bullets = 0;
+    roundEndedWithLaugh = false;
+    updateUI();
+    setTimeout(startRound, 1000);
+}
+
 function addDog(duckCount) {
     let dogImage = document.createElement("img");
     dogImage.classList.add("dog-popup");
@@ -326,21 +477,19 @@ function addDog(duckCount) {
     }
     dogImage.draggable = false;
 
-    dogImage.style.position = "fixed"; // Stay in same place even when scrolling
-    dogImage.style.bottom = "0px"; // Bottom side of image 0px from bottom of page
-    dogImage.style.left = "50%"; // Left side of image 50% screen width from left side of page
+    dogImage.style.position = "fixed";
+    dogImage.style.bottom = "0px";
+    dogImage.style.left = "50%";
     document.body.appendChild(dogImage);
 
     let dogScoreSound = new Audio("assets/sounds/dog-score.mp3");
     dogScoreSound.play();
 
     setTimeout(function () {
-        document.body.removeChild(dogImage);
-        addDucks();
+        if (dogImage.parentElement) document.body.removeChild(dogImage);
     }, 3000);
 }
 
-// special laughing dog when bullets run out
 function addDogLaugh() {
     let dogImage = document.createElement("img");
     dogImage.classList.add("dog-popup");
@@ -358,8 +507,7 @@ function addDogLaugh() {
     dogLaughSound.play();
 
     setTimeout(function () {
-        document.body.removeChild(dogImage);
-        addDucks();
+        if (dogImage.parentElement) document.body.removeChild(dogImage);
     }, 3000);
 }
 
@@ -380,3 +528,6 @@ function renderBullets() {
 function randomPosition(limit) {
     return Math.floor(Math.random() * limit);
 }
+
+// ensure UI initialised
+window.addEventListener("load", updateUI);

@@ -19,9 +19,22 @@
                 <img src="assets/images/duck-em-up-score.png" alt="Scoreboard" draggable="false">
                 <p id="score">0</p>
                 <div id="bullets" aria-live="polite" title="Bullets"></div>
+
+                <!-- Game info: show misses -->
+                <div id="game-info" aria-live="polite" class="game-info">
+                    <div id="misses" class="miss-hearts" aria-live="polite" aria-label="Misses left"></div>
+                </div>
             </div>
         </div>
     </header>
+
+    <!-- level announcement overlay -->
+    <div id="level-announcement" class="level-announcement hidden" aria-live="polite" role="status">
+        <div class="level-announcement__content">
+            <h1 id="announcement-text">Level 1</h1>
+            <p class="subtext">Get Ready!</p>
+        </div>
+    </div>
 
     <main>
         <!-- place main content here -->

@@ -81,6 +81,39 @@ img {
     pointer-events: auto;
 }
 
+.scoreboard__icon .game-info {
+    position: absolute;
+    bottom: -0.6em;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    font-family: gameFont;
+    font-size: clamp(10px, 1.6vw, 14px);
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+
+.scoreboard__icon .miss-hearts {
+    position: absolute;
+    bottom: -0.6em;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    pointer-events: none;
+}
+
+/* heart icon (acts like life/health) */
+.miss-hearts .heart-icon {
+    width: clamp(16px, 2.4vw, 28px);
+    height: auto;
+    display: block;
+    user-select: none;
+}
+
 .dog-popup {
     position: fixed;
     bottom: 0;
@@ -124,6 +157,64 @@ img {
     opacity: 1;
     display: block;
     user-select: none;
+}
+
+/* level announcement overlay */
+.level-announcement {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    z-index: 20000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms ease;
+}
+.level-announcement__content {
+    text-align: center;
+    color: #fff;
+    pointer-events: none;
+    transform: translateY(8px);
+    animation: level-pop 700ms ease;
+    font-family: gameFont, sans-serif;
+}
+.level-announcement__content h1 {
+    font-size: clamp(28px, 8vw, 72px);
+    margin: 0;
+    letter-spacing: 1px;
+}
+.level-announcement__content .subtext {
+    margin-top: 8px;
+    font-size: clamp(12px, 2.6vw, 20px);
+    opacity: 0.95;
+    font-family: gameFont, sans-serif;
+}
+
+/* visible / hidden helpers */
+.level-announcement.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.level-announcement:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@keyframes level-pop {
+    0% {
+        transform: translateY(24px) scale(0.96);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-6px) scale(1.02);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
 }
 
 *,
