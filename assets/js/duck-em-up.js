@@ -77,6 +77,9 @@ window.onload = function () {
         bullets = Math.max(0, bullets - 1);
         renderBullets();
 
+        // play shooting sound even on misses
+        new Audio("assets/sounds/duck-shot.mp3").play();
+
         // If bullets run out while ducks remain -> show laughing dog and reset round
         if (bullets === 0 && ducks && ducks.length > 0) {
             // remove remaining ducks from DOM and clear array
@@ -161,7 +164,6 @@ function addDucks() {
                 return;
             }
 
-            const originalSrc = this.src;
             this.classList.add("duck-shot-image");
             this.src = "assets/images/duck-shot.png";
 
