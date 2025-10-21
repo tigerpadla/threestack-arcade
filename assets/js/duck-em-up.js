@@ -78,6 +78,12 @@ function showLevelAnnouncement(level, cb) {
     }
     text.textContent = `Level ${level}`;
     overlay.classList.remove("hidden");
+
+    // play new-level sound when a level is completed (i.e. starting a new level when level > 1)
+    if (level > 1) {
+        new Audio("assets/sounds/duck-em-up-level-complete.mp3").play();
+    }
+
     // keep visible for 1800ms, then hide and call callback
     setTimeout(() => {
         overlay.classList.add("hidden");
