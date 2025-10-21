@@ -67,7 +67,7 @@ img {
     max-width: 90vw;
 }
 
-.scoreboard__icon img {
+.scoreboard__icon > img {
     width: 100%;
     height: auto;
     display: block;
@@ -106,16 +106,20 @@ img {
 }
 
 #bullets {
-    position: absolute;
-    bottom: 8%;
-    right: 6%;
+    position: fixed;
+    top: var(--scoreboard-padding-y);
+    left: var(--scoreboard-padding-y);
     display: flex;
-    gap: 6px;
+    gap: 2px;
+    padding: 2px;
     pointer-events: none;
+    z-index: 10000;
 }
 
+/* smaller bullet icons */
 .bullet-icon {
-    width: clamp(18px, 2.6vw, 28px);
+    width: clamp(18px, 3.5vw, 44px) !important;
+    max-width: 44px;
     height: auto;
     opacity: 1;
     display: block;
