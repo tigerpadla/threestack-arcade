@@ -15,8 +15,9 @@ let gameHeight = (window.screen.height * 3) / 4;
 let score = 0;
 let quackTimer = null;
 
-// new: bullets tracking
+// bullets tracking
 let bullets = 0;
+let roundEndedWithLaugh = false;
 
 function randomDelay(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -80,17 +81,20 @@ window.onload = function () {
         // play shooting sound even on misses
         new Audio("assets/sounds/duck-shot.mp3").play();
 
-        // If bullets run out while ducks remain -> show laughing dog and reset round
+        // If bullets run out while ducks remain -> make remaining ducks fly away upward
         if (bullets === 0 && ducks && ducks.length > 0) {
-            // remove remaining ducks from DOM and clear array
+            roundEndedWithLaugh = true;
+            // set remaining non-shot/non-falling ducks to fly away
             ducks.forEach((d) => {
-                if (d.image && d.image.parentElement) {
-                    d.image.parentElement.removeChild(d.image);
+                if (d.state === "flying") {
+                    d.state = "flyingAway";
+                    // give a strong upward velocity
+                    d.velocityY = -10;
+                    // optionally reduce horizontal movement while fleeing upward
+                    d.velocityX = d.velocityX * 0.2;
                 }
             });
-            ducks = [];
             stopQuackLoop();
-            addDogLaugh(); // special laugh popup (then restart)
         }
     });
 };
@@ -101,6 +105,8 @@ function addDucks() {
 
     // bullets = duckCount + 1
     bullets = duckCount + 1;
+    // reset round flag when starting a new round
+    roundEndedWithLaugh = false;
     renderBullets();
 
     for (let i = 0; i < duckCount; i++) {
@@ -137,52 +143,42 @@ function addDucks() {
             bullets = Math.max(0, bullets - 1);
             renderBullets();
 
-            // mark duck as shot
-            this.dataset.state = "shot";
-            duckEntry.state = "shot";
-            duckEntry.velocityX = 0;
-            duckEntry.velocityY = 0;
-
             // play shot sound and update score
-            let duckShotSound = new Audio("assets/sounds/duck-shot.mp3");
-            duckShotSound.play();
+            new Audio("assets/sounds/duck-shot.mp3").play();
             score += 1;
             document.getElementById("score").innerHTML = score;
 
-            // If bullets ran out and there are still flying ducks, end round with laugh
+            // Immediately set clicked duck to falling (no intermediate 'shot' delay)
+            this.dataset.state = "falling";
+            duckEntry.state = "falling";
+            // stop horizontal motion
+            duckEntry.velocityX = 0;
+            duckEntry.velocityY = 0;
+
+            // initialize falling physics & play fall audio
+            duckEntry.fallVelocity = 6;
+            duckEntry.maxFallVelocity = 20;
+            duckEntry.gravity = 0.9;
+            duckEntry.fallAudio = new Audio("assets/sounds/duck-fall.mp3");
+            duckEntry.fallAudio.loop = true;
+            duckEntry.fallAudio.play();
+
+            // set fall image immediately
+            this.classList.remove("duck-shot-image");
+            this.src = "assets/images/duck-fall.gif";
+
+            // If bullets ran out and there are still flying ducks, make them fly away
             const flyingDucks = ducks.filter((d) => d.state === "flying");
             if (bullets === 0 && flyingDucks.length > 0) {
-                // remove remaining ducks and stop round
-                ducks.forEach((d) => {
-                    if (d.image && d.image.parentElement) {
-                        d.image.parentElement.removeChild(d.image);
-                    }
+                roundEndedWithLaugh = true;
+                flyingDucks.forEach((d) => {
+                    d.state = "flyingAway";
+                    d.velocityY = -10;
+                    d.velocityX = (d.velocityX || 0) * 0.2;
                 });
-                ducks = [];
                 stopQuackLoop();
-                addDogLaugh();
                 return;
             }
-
-            this.classList.add("duck-shot-image");
-            this.src = "assets/images/duck-shot.png";
-
-            setTimeout(() => {
-                if (!duckEntry.image.parentElement) {
-                    return;
-                }
-                this.classList.remove("duck-shot-image");
-                this.src = "assets/images/duck-fall.gif";
-                this.dataset.state = "falling";
-
-                duckEntry.state = "falling";
-                duckEntry.fallVelocity = 6;
-                duckEntry.maxFallVelocity = 20;
-                duckEntry.gravity = 0.9;
-                duckEntry.fallAudio = new Audio("assets/sounds/duck-fall.mp3");
-                duckEntry.fallAudio.loop = true;
-                duckEntry.fallAudio.play();
-            }, 1000);
         };
         document.body.appendChild(duckImage);
 
@@ -199,7 +195,7 @@ function addDucks() {
             fallAudio: null,
         };
         duck.image.style.left = String(duck.x) + "px"; // X position
-        duck.image.style.top = String(duck.y) + "px"; // Y position
+        duck.image.style.top = String(duck.y) + "px"; // Y Position
 
         if (duck.image.src.includes(duckImageNames[0])) {
             duck.velocityX = -duckVelocityX; // Going left
@@ -213,10 +209,12 @@ function moveDucks() {
     for (let i = ducks.length - 1; i >= 0; i--) {
         let duck = ducks[i];
 
+        // handle already-shot (static) ducks
         if (duck.state === "shot") {
             continue;
         }
 
+        // handle falling ducks
         if (duck.state === "falling") {
             duck.fallVelocity = Math.min(
                 (duck.fallVelocity || 0) + (duck.gravity || 0),
@@ -242,12 +240,54 @@ function moveDucks() {
 
                 if (ducks.length === 0) {
                     stopQuackLoop();
-                    addDog(duckCount);
+                    // respect roundEndedWithLaugh: show laughing dog if bullets ran out,
+                    // otherwise show normal dog popup
+                    if (roundEndedWithLaugh) {
+                        addDogLaugh();
+                        roundEndedWithLaugh = false;
+                    } else {
+                        addDog(duckCount);
+                    }
                 }
                 continue;
             }
 
             duck.image.style.top = `${duck.y}px`;
+            continue;
+        }
+
+        // handle flying-away ducks (when bullets ran out)
+        if (duck.state === "flyingAway") {
+            // move upwards
+            duck.y += duck.velocityY;
+            // increase upward speed (more negative)
+            duck.velocityY = (duck.velocityY || -4) - 0.5;
+            // optional small horizontal drift
+            duck.x += (duck.velocityX || 0) * 0.1;
+
+            // update position
+            duck.image.style.top = `${duck.y}px`;
+            duck.image.style.left = `${duck.x}px`;
+
+            // if duck has flown beyond the top of the game area, remove it
+            if (duck.y + duckHeight < 0) {
+                if (duck.image.parentElement) {
+                    duck.image.parentElement.removeChild(duck.image);
+                }
+                ducks.splice(i, 1);
+
+                // when last duck removed decide which popup to show
+                if (ducks.length === 0) {
+                    if (roundEndedWithLaugh) {
+                        stopQuackLoop();
+                        addDogLaugh();
+                        roundEndedWithLaugh = false;
+                    } else {
+                        stopQuackLoop();
+                        addDog(duckCount);
+                    }
+                }
+            }
             continue;
         }
 
