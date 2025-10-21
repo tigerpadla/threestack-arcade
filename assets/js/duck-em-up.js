@@ -15,6 +15,9 @@ let gameHeight = (window.screen.height * 3) / 4;
 let score = 0;
 let quackTimer = null;
 
+// new: bullets tracking
+let bullets = 0;
+
 function randomDelay(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -49,11 +52,54 @@ window.onload = function () {
     // addDucks();
     setTimeout(addDucks, 2000); // Wait 2 seconds
     setInterval(moveDucks, 1000 / 60); // 60 frames per second
+
+    // Miss-click handler: clicking anywhere that's not a duck consumes a bullet
+    document.addEventListener("click", function (e) {
+        // if no ducks or no bullets, nothing to do
+        if (!ducks || ducks.length === 0 || bullets <= 0) {
+            return;
+        }
+        // If click target is a duck (has class 'duck'), it's a hit and handled separately.
+        if (
+            e.target &&
+            e.target.classList &&
+            e.target.classList.contains("duck")
+        ) {
+            return;
+        }
+        // Also ignore clicks on scoreboard area
+        let scoreboard = document.querySelector(".scoreboard");
+        if (scoreboard && scoreboard.contains(e.target)) {
+            return;
+        }
+
+        // Miss: consume one bullet and update UI
+        bullets = Math.max(0, bullets - 1);
+        renderBullets();
+
+        // If bullets run out while ducks remain -> show laughing dog and reset round
+        if (bullets === 0 && ducks && ducks.length > 0) {
+            // remove remaining ducks from DOM and clear array
+            ducks.forEach((d) => {
+                if (d.image && d.image.parentElement) {
+                    d.image.parentElement.removeChild(d.image);
+                }
+            });
+            ducks = [];
+            stopQuackLoop();
+            addDogLaugh(); // special laugh popup (then restart)
+        }
+    });
 };
 
 function addDucks() {
     ducks = [];
     duckCount = Math.floor(Math.random() * 3) + 1;
+
+    // bullets = duckCount + 1
+    bullets = duckCount + 1;
+    renderBullets();
+
     for (let i = 0; i < duckCount; i++) {
         let duckImageName = duckImageNames[Math.floor(Math.random() * 2)];
         let duckImage = document.createElement("img");
@@ -64,7 +110,15 @@ function addDucks() {
         duckImage.style.position = "absolute";
         duckImage.dataset.state = "flying";
 
-        duckImage.onclick = function () {
+        // mark as duck so miss handler can ignore hits
+        duckImage.classList.add("duck");
+
+        duckImage.onclick = function (event) {
+            // prevent document-level miss handler from running
+            if (event && event.stopPropagation) {
+                event.stopPropagation();
+            }
+
             if (
                 this.dataset.state === "shot" ||
                 this.dataset.state === "falling"
@@ -76,15 +130,36 @@ function addDucks() {
                 return;
             }
 
+            // consume one bullet for this shot and update UI
+            bullets = Math.max(0, bullets - 1);
+            renderBullets();
+
+            // mark duck as shot
             this.dataset.state = "shot";
             duckEntry.state = "shot";
             duckEntry.velocityX = 0;
             duckEntry.velocityY = 0;
 
+            // play shot sound and update score
             let duckShotSound = new Audio("assets/sounds/duck-shot.mp3");
             duckShotSound.play();
             score += 1;
             document.getElementById("score").innerHTML = score;
+
+            // If bullets ran out and there are still flying ducks, end round with laugh
+            const flyingDucks = ducks.filter((d) => d.state === "flying");
+            if (bullets === 0 && flyingDucks.length > 0) {
+                // remove remaining ducks and stop round
+                ducks.forEach((d) => {
+                    if (d.image && d.image.parentElement) {
+                        d.image.parentElement.removeChild(d.image);
+                    }
+                });
+                ducks = [];
+                stopQuackLoop();
+                addDogLaugh();
+                return;
+            }
 
             const originalSrc = this.src;
             this.classList.add("duck-shot-image");
@@ -221,6 +296,43 @@ function addDog(duckCount) {
         document.body.removeChild(dogImage);
         addDucks();
     }, 3000);
+}
+
+// special laughing dog when bullets run out
+function addDogLaugh() {
+    let dogImage = document.createElement("img");
+    dogImage.classList.add("dog-popup");
+    dogImage.src = "assets/images/dog-laugh.gif";
+    dogImage.width = 150;
+    dogImage.height = 210;
+    dogImage.draggable = false;
+
+    dogImage.style.position = "fixed";
+    dogImage.style.bottom = "0px";
+    dogImage.style.left = "50%";
+    document.body.appendChild(dogImage);
+
+    let dogLaughSound = new Audio("assets/sounds/dog-laugh.mp3");
+    dogLaughSound.play();
+
+    setTimeout(function () {
+        document.body.removeChild(dogImage);
+        addDucks();
+    }, 3000);
+}
+
+// render bullets as icons
+function renderBullets() {
+    let container = document.getElementById("bullets");
+    if (!container) return;
+    container.innerHTML = "";
+    for (let i = 0; i < bullets; i++) {
+        let b = document.createElement("img");
+        b.classList.add("bullet-icon");
+        b.src = "assets/images/duck-em-up-bullet.png";
+        b.draggable = false;
+        container.appendChild(b);
+    }
 }
 
 function randomPosition(limit) {
