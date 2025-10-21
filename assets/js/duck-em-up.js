@@ -468,6 +468,14 @@ function showGameCompleteAnnouncement() {
     if (scoreEl) scoreEl.textContent = String(score);
     overlay.classList.remove("hidden");
 
+    // play completion sound on popup
+    try {
+        const completeSfx = new Audio("assets/sounds/duck-em-up-game-over.mp3");
+        completeSfx.play();
+    } catch (_) {
+        // ignore autoplay errors
+    }
+
     // ensure single handler: replace node to remove any previous listeners, then attach reload
     if (playBtn) {
         const newBtn = playBtn.cloneNode(true);
@@ -559,6 +567,14 @@ function showGameOverAnnouncement() {
     if (!overlay) return;
 
     overlay.classList.remove("hidden");
+
+    // play fail sound when game over pops up
+    try {
+        const failSfx = new Audio("assets/sounds/duck-em-up-fail.mp3");
+        failSfx.play();
+    } catch (_) {
+        // ignore autoplay errors
+    }
 
     // ensure single handler: replace with a fresh node then attach simple reload
     if (restartBtn) {
