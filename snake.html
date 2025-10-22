@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snake</title>
     <link rel="stylesheet" href="./assets/css/snake-style.css">
-    <script src="script.js" defer></script>
+
 </head>
 
 <body class="body-image">
@@ -18,9 +18,13 @@
             <span class="high-score">High Score: 0</span>
         </div>
         <div class="play-board">
-
+            <div class="food" style="grid-area: ${foodY} / ${foodX}"></div>
         </div>
     </div>
+
+
+
+    <script src="./assets/js/snake.js" defer></script>
 </body>
 
 </html>
