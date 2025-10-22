@@ -1,0 +1,41 @@
+/*import a google font*/
+
+/*game board styles*/
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+.body-image {
+    background-image: url("../images/Snake-backround.png");
+    repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100%;
+    color: white;
+}
+
+.wrapper {
+    width: 80vmin;
+    height: 70vmin;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    border-radius: 5px;
+    background-color: #0d5735;
+}
+.game-details {
+    color: #96baf4;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 20px 27px;
+    display: flex;
+    justify-content: space-between;
+}
+.play-board {
+    width: 100%;
+    height: 100%;
+    background-color: #127d4b;
+    display: grid;
+    grid-template: repeat(32, 1fr) / repeat(32, 1fr);
+}
