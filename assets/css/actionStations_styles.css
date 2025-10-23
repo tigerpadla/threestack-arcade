@@ -139,6 +139,7 @@ h2 {
     border: 1px solid #fdba00;
     border-radius: 0px;
     margin-bottom: 0.4rem;
+    width: 8em;
 }
 .button-intel {
     background-color: var(--background-color);
@@ -147,7 +148,7 @@ h2 {
     color: var(--primary-color);
     border: 1px solid #fdba00;
     border-radius: 0px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
     width: 100%;
 }
 .button-intel:hover {
@@ -182,6 +183,23 @@ h2 {
     text-transform: uppercase;
     border: 1px solid #fdba00;
     border-radius: 0px;
+}
+.table-modal {
+    border: 1px solid #fdba00;
+    border-radius: 0px;
+    background-color: var(--background-color);
+    width: 100%;
+}
+.table-modal th {
+    text-transform: uppercase;
+    text-align: center;
+}
+.table-modal tr {
+    text-align: center;
+    height: 70px;
+}
+.modal-body ul {
+    margin-bottom: 0.75rem;
 }
 
 /* Message log styling */
