@@ -1,0 +1,275 @@
+html,
+body {
+    cursor: url("../images/duck-em-up-target.png"), auto;
+}
+
+body {
+    background: url("../images/duck-em-up-background.png");
+    background-color: #3cbcfc;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    margin: 0;
+    padding-top: calc(
+        var(--scoreboard-icon-width) * 0.65 + var(--scoreboard-padding-y) * 2
+    );
+}
+
+@font-face {
+    font-family: gameFont;
+    src: url("../fonts/duck-em-up-font.otf");
+}
+
+#score {
+    font-size: clamp(20px, 5.2vw, 32px);
+    font-family: gameFont;
+    color: white;
+    margin: 0;
+    text-align: center;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+img {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+:root {
+    --scoreboard-padding-y: clamp(6px, 0.9vw, 14px);
+    --scoreboard-icon-width: clamp(120px, 18vw, 200px);
+}
+
+.scoreboard {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding: var(--scoreboard-padding-y) 0;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.scoreboard__icon {
+    position: relative;
+    width: var(--scoreboard-icon-width);
+    max-width: 90vw;
+}
+
+.scoreboard__icon > img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.scoreboard__icon #score {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -90%);
+    pointer-events: auto;
+}
+
+.scoreboard__icon .game-info {
+    position: absolute;
+    bottom: -0.6em;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    font-family: gameFont;
+    font-size: clamp(10px, 1.6vw, 14px);
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+
+.header-misses {
+    position: fixed;
+    top: var(--scoreboard-padding-y);
+    right: var(--scoreboard-padding-y);
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10001;
+    font-family: gameFont;
+    font-size: clamp(10px, 1.6vw, 14px);
+}
+
+.scoreboard__icon .miss-hearts {
+    position: absolute;
+    bottom: -0.6em;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    pointer-events: none;
+}
+
+/* Heart / red duck icon (acts like health) */
+.miss-hearts .heart-icon {
+    width: clamp(38px, 7.9vw, 84px);
+    height: auto;
+    display: block;
+    user-select: none;
+}
+
+.dog-popup {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    animation: dog-pop 2.2s ease-in-out forwards;
+    pointer-events: none;
+}
+
+@keyframes dog-pop {
+    0%,
+    100% {
+        transform: translate(-50%, 100%);
+    }
+    20%,
+    80% {
+        transform: translate(-50%, 0);
+    }
+}
+
+.duck-shot-image {
+    transform: scale(1.18);
+}
+
+#bullets {
+    position: fixed;
+    top: var(--scoreboard-padding-y);
+    left: var(--scoreboard-padding-y);
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+.bullet-icon {
+    width: clamp(18px, 3.5vw, 44px) !important;
+    max-width: 44px;
+    height: auto;
+    opacity: 1;
+    display: block;
+    user-select: none;
+}
+
+.level-announcement {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    z-index: 20000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms ease;
+}
+.level-announcement__content {
+    text-align: center;
+    color: #fff;
+    pointer-events: none;
+    transform: translateY(8px);
+    animation: level-pop 700ms ease;
+    font-family: gameFont, sans-serif;
+}
+.level-announcement__content h1 {
+    font-size: clamp(28px, 8vw, 72px);
+    margin: 0;
+    letter-spacing: 1px;
+}
+.level-announcement__content .subtext {
+    margin-top: 8px;
+    font-size: clamp(12px, 2.6vw, 20px);
+    opacity: 0.95;
+    font-family: gameFont, sans-serif;
+}
+
+/* visible / hidden helpers */
+.level-announcement.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.level-announcement:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@keyframes level-pop {
+    0% {
+        transform: translateY(24px) scale(0.96);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-6px) scale(1.02);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Restart button */
+.level-announcement__content .game-over-button,
+.game-over-button {
+    margin-top: 12px;
+    padding: 6px 14px;
+    font-family: gameFont, monospace;
+    font-size: clamp(12px, 2.6vw, 18px);
+    color: #111; /* dark text on light button */
+    background: linear-gradient(#ffd966, #ffb300); /* simple two-tone */
+    border: 4px solid #111; /* thick dark border */
+    border-bottom-width: 8px; /* extra thickness to look 3D */
+    border-right-width: 8px;
+    border-radius: 4px;
+    box-shadow: 0 8px 0 #000, inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    pointer-events: auto;
+    image-rendering: pixelated; /* keep crisp edges on scaled displays */
+    transition: transform 60ms linear, box-shadow 60ms linear;
+}
+
+/* Pressed effect */
+.game-over-button:active {
+    transform: translateY(6px);
+    box-shadow: 0 2px 0 #000;
+    border-bottom-width: 4px;
+    border-right-width: 4px;
+}
+
+.game-over-button:hover,
+.game-over-button:focus {
+    filter: brightness(1.05);
+    outline: none;
+}
+
+/* Global: prevent text selection/dragging and keep custom cursor */
+*,
+*::before,
+*::after {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+    cursor: url("../images/duck-em-up-target.png"), auto !important;
+}
