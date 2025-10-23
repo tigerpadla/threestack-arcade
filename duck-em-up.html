@@ -19,13 +19,11 @@
                 <img src="assets/images/duck-em-up-score.png" alt="Scoreboard" draggable="false">
                 <p id="score">0</p>
                 <div id="bullets" aria-live="polite" title="Bullets"></div>
-
-                <!-- Game info: show misses -->
-                <div id="game-info" aria-live="polite" class="game-info">
-                    <div id="misses" class="miss-hearts" aria-live="polite" aria-label="Misses left"></div>
-                </div>
             </div>
         </div>
+
+        <!-- moved: top-right misses container (keeps same id so JS does not change) -->
+        <div id="misses" class="miss-hearts header-misses" aria-live="polite" aria-label="Misses left"></div>
     </header>
 
     <!-- level announcement overlay -->

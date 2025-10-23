@@ -95,6 +95,21 @@ img {
     pointer-events: none;
 }
 
+/* header top-right placement for misses (keeps same .miss-hearts/heart-icon appearance) */
+.header-misses {
+    position: fixed;
+    top: var(--scoreboard-padding-y);
+    right: var(--scoreboard-padding-y);
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10001;
+    font-family: gameFont;
+    font-size: clamp(10px, 1.6vw, 14px);
+}
+
+/* scoreboard-specific placement for misses when they remain inside the scoreboard (keeps compatibility) */
 .scoreboard__icon .miss-hearts {
     position: absolute;
     bottom: -0.6em;
@@ -108,7 +123,8 @@ img {
 
 /* heart icon (acts like life/health) */
 .miss-hearts .heart-icon {
-    width: clamp(16px, 2.4vw, 28px);
+    /* slightly bigger than before */
+    width: clamp(38px, 7.9vw, 84px);
     height: auto;
     display: block;
     user-select: none;
