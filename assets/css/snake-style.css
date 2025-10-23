@@ -6,6 +6,7 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    overflow: hidden;
 }
 .body-image {
     background-image: url("../images/Snake-backround.png");
@@ -41,9 +42,61 @@ body {
 }
 
 .play-board .food {
-    background: red;
-    border-radius: 50%;
+    background-image: url("../images/snake-food-sprite-1.png.png");
+    background-size: 100% 100%;
 }
 .play-board .head {
-    background: rgb(221, 232, 14);
+    background-image: url("/assets/images/snake-sprite-head.png");
+    background-size: 100% 100%;
+}
+
+.play-board .snake-body {
+    background-image: url("/assets/images/snake-sprite-body.png");
+    background-size: 100% 100%;
+}
+
+.play-board .snake-tail {
+    background-image: url("/assets/images/snake-sprite-tail.png");
+    background-size: 100% 100%;
+}
+.play-board .down {
+    transform: rotate(270deg);
+}
+.play-board .up {
+    transform: rotate(90deg);
+}
+.play-board .right {
+    transform: rotate(180deg);
+}
+.controls {
+    display: none;
+    justify-content: space-evenly;
+}
+
+.controls i {
+    padding: 25px 0;
+    color: #96baf4;
+    width: calc(100% / 4);
+    text-align: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    border-right: 1px solid;
+}
+
+@media screen and (max-width: 800px) {
+    .wrapper {
+        width: 90vmin;
+        height: 115vmin;
+    }
+    .game-details {
+        font-size: 1rem;
+        padding: 15px 27px;
+    }
+    .controls {
+        display: flex;
+    }
+    .controls i {
+        padding: 15px 0;
+        font-size: 1rem;
+    }
 }

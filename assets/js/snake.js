@@ -1,6 +1,8 @@
 const playBoard = document.querySelector(".play-board");
 const scoreElement = document.querySelector(".score");
 const highScoreElement = document.querySelector(".high-score");
+const controls = document.querySelectorAll(".controls i");
+let snakeDirection = "left";
 
 let gameOver = false;
 
@@ -35,18 +37,46 @@ const changeDirection = (e) => {
     if (e.key === "ArrowUp" && velocityY !== 1) {
         velocityX = 0;
         velocityY = -1;
+        snakeDirection = "up";
     } else if (e.key === "ArrowDown" && velocityY !== -1) {
         velocityX = 0;
         velocityY = 1;
+        snakeDirection = "down";
     } else if (e.key === "ArrowLeft" && velocityX !== 1) {
         velocityX = -1;
         velocityY = 0;
+        snakeDirection = "left";
     } else if (e.key === "ArrowRight" && velocityX !== -1) {
         velocityX = 1;
         velocityY = 0;
+        snakeDirection = "right";
     }
     initGame();
 };
+
+const addDirectionClass = (direction) => {
+    const head = document.querySelector(".head");
+    head.classList.remove("up", "down", "right");
+    head.classList.add(direction);
+    const tail = document.querySelector(".snake-tail");
+    if (!tail) return;
+    tail.classList.remove("up", "down", "right");
+    tail.classList.add(direction);
+
+    const bodies = document.querySelectorAll(".snake-body");
+    if (bodies.length === 0) return;
+    bodies.forEach((body) => {
+        body.classList.remove("up", "down", "right");
+        body.classList.add(direction);
+    });
+};
+
+controls.forEach((key) => {
+    //adding click event for touch controls
+    key.addEventListener("click", () =>
+        changeDirection({ key: key.dataset.key })
+    );
+});
 
 const initGame = () => {
     if (gameOver) return handleGameOver();
@@ -84,7 +114,13 @@ const initGame = () => {
 
     for (let i = 0; i < snakeBody.length; i++) {
         //adding a div for each part of the snake body
-        htmlMarkup += `<div class="head" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}"></div>`;
+        if (i == 0) {
+            htmlMarkup += `<div class="head" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}"></div>`;
+        } else if (i == snakeBody.length - 1) {
+            htmlMarkup += `<div class="snake-tail" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}"></div>`;
+        } else {
+            htmlMarkup += `<div class="snake-body" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}"></div>`;
+        }
 
         //check if snake head hits body, if true game over
         if (
@@ -97,8 +133,11 @@ const initGame = () => {
     }
 
     playBoard.innerHTML = htmlMarkup;
+    addDirectionClass(snakeDirection);
 };
 
 changeFoodPosition();
 setIntervalId = setInterval(initGame, 125);
 document.addEventListener("keydown", changeDirection);
+
+// snakeBody = [[5, 10], [6, 10], [7, 10], [8, 10], [9, 10], [10, 10]]
