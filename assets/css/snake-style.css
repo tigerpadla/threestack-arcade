@@ -46,17 +46,17 @@ body {
     background-size: 100% 100%;
 }
 .play-board .head {
-    background-image: url("/assets/images/snake-sprite-head.png");
+    background-image: url("./assets/images/snake-sprite-head.png");
     background-size: 100% 100%;
 }
 
 .play-board .snake-body {
-    background-image: url("/assets/images/snake-sprite-body.png");
+    background-image: url("./assets/images/snake-sprite-body.png");
     background-size: 100% 100%;
 }
 
 .play-board .snake-tail {
-    background-image: url("/assets/images/snake-sprite-tail.png");
+    background-image: url("./assets/images/snake-sprite-tail.png");
     background-size: 100% 100%;
 }
 .play-board .down {
