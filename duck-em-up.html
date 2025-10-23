@@ -3,12 +3,14 @@
 
 <head>
     <title>Duck 'Em Up</title>
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description"
         content="Duck 'Em Up - a fast-paced Duck Hunt-style browser game from the ThreeStack Arcade hackathon project. Shoot ducks, save bullets, and beat the high score!">
-    <meta name="keywords" content="duck hunt, duck em up, arcade game, browser game, hackathon, ThreeStack Arcade, mini game">
+    <meta name="keywords"
+        content="duck hunt, duck em up, arcade game, browser game, hackathon, ThreeStack Arcade, mini game">
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/duck-em-up-apple-touch-icon.png">
@@ -31,11 +33,10 @@
             </div>
         </div>
 
-        <!-- moved: top-right misses container (keeps same id so JS does not change) -->
         <div id="misses" class="miss-hearts header-misses" aria-live="polite" aria-label="Misses left"></div>
     </header>
 
-    <!-- level announcement overlay -->
+    <!-- Level announcement overlay -->
     <div id="level-announcement" class="level-announcement hidden" aria-live="polite" role="status">
         <div class="level-announcement__content">
             <h1 id="announcement-text">Level 1</h1>
@@ -43,7 +44,7 @@
         </div>
     </div>
 
-    <!-- game over announcement overlay (same visual style; includes Restart) -->
+    <!-- Game over announcement overlay -->
     <div id="game-over-announcement" class="level-announcement hidden" aria-live="polite" role="alert">
         <div class="level-announcement__content">
             <h1 id="game-over-text">Game Over</h1>
@@ -52,7 +53,7 @@
         </div>
     </div>
 
-    <!-- game complete announcement overlay (shows final score briefly) -->
+    <!-- Game complete announcement overlay -->
     <div id="game-complete-announcement" class="level-announcement hidden" aria-live="polite" role="status">
         <div class="level-announcement__content">
             <h1 id="game-complete-text">You've Ducked 'Em Up! All ducks down!</h1>

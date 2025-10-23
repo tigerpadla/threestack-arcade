@@ -15,18 +15,15 @@ let gameHeight = (window.screen.height * 3) / 4;
 let score = 0;
 let quackTimer = null;
 
-// bullets tracking
 let bullets = 0;
 let roundEndedWithLaugh = false;
 
-// --- new: level/round state ---
 let currentLevel = 1;
 let currentRound = 1;
 const roundsPerLevel = 3;
 const maxLevels = 5;
 let missesThisLevel = 0;
 
-// level settings: min, max, speed multiplier (applied to base velocities)
 const levelSettings = [
     /* level 1 */ { min: 1, max: 3, speed: 1 }, // Normal
     /* level 2 */ { min: 2, max: 5, speed: 1 }, // Normal
@@ -68,7 +65,6 @@ function stopQuackLoop() {
     }
 }
 
-// new: show level announcement then call callback
 function showLevelAnnouncement(level, cb) {
     const overlay = document.getElementById("level-announcement");
     const text = document.getElementById("announcement-text");
@@ -77,7 +73,7 @@ function showLevelAnnouncement(level, cb) {
         return;
     }
 
-    // ensure misses are hidden during the Level 1 announcement
+    // Ensure misses are hidden during the Level 1 announcement
     const missesEl = document.getElementById("misses");
     if (level === 1 && missesEl) {
         missesEl.dataset._prevDisplay = missesEl.style.display || "";
@@ -87,7 +83,6 @@ function showLevelAnnouncement(level, cb) {
     text.textContent = `Level ${level}`;
     overlay.classList.remove("hidden");
 
-    // play new-level sound when a level is completed (i.e. starting a new level when level > 1)
     if (level > 1) {
         new Audio("assets/sounds/duck-em-up-level-complete.mp3").play();
     }

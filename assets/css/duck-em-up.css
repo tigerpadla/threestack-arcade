@@ -95,7 +95,6 @@ img {
     pointer-events: none;
 }
 
-/* header top-right placement for misses (keeps same .miss-hearts/heart-icon appearance) */
 .header-misses {
     position: fixed;
     top: var(--scoreboard-padding-y);
@@ -109,7 +108,6 @@ img {
     font-size: clamp(10px, 1.6vw, 14px);
 }
 
-/* scoreboard-specific placement for misses when they remain inside the scoreboard (keeps compatibility) */
 .scoreboard__icon .miss-hearts {
     position: absolute;
     bottom: -0.6em;
@@ -121,9 +119,8 @@ img {
     pointer-events: none;
 }
 
-/* heart icon (acts like life/health) */
+/* Heart / red duck icon (acts like health) */
 .miss-hearts .heart-icon {
-    /* slightly bigger than before */
     width: clamp(38px, 7.9vw, 84px);
     height: auto;
     display: block;
@@ -165,7 +162,6 @@ img {
     z-index: 10000;
 }
 
-/* smaller bullet icons */
 .bullet-icon {
     width: clamp(18px, 3.5vw, 44px) !important;
     max-width: 44px;
@@ -175,7 +171,6 @@ img {
     user-select: none;
 }
 
-/* level announcement overlay */
 .level-announcement {
     position: fixed;
     inset: 0;
@@ -233,10 +228,9 @@ img {
     }
 }
 
-/* restart button */
+/* Restart button */
 .level-announcement__content .game-over-button,
 .game-over-button {
-    /* retro pixel button */
     margin-top: 12px;
     padding: 6px 14px;
     font-family: gameFont, monospace;
@@ -254,7 +248,7 @@ img {
     transition: transform 60ms linear, box-shadow 60ms linear;
 }
 
-/* pressed effect */
+/* Pressed effect */
 .game-over-button:active {
     transform: translateY(6px);
     box-shadow: 0 2px 0 #000;
@@ -262,14 +256,13 @@ img {
     border-right-width: 4px;
 }
 
-/* hover/focus keep simple contrast change */
 .game-over-button:hover,
 .game-over-button:focus {
     filter: brightness(1.05);
     outline: none;
 }
 
-/* global: prevent text selection/dragging and keep custom cursor */
+/* Global: prevent text selection/dragging and keep custom cursor */
 *,
 *::before,
 *::after {
