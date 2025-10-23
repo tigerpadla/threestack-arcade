@@ -76,6 +76,14 @@ function showLevelAnnouncement(level, cb) {
         if (typeof cb === "function") cb();
         return;
     }
+
+    // ensure misses are hidden during the Level 1 announcement
+    const missesEl = document.getElementById("misses");
+    if (level === 1 && missesEl) {
+        missesEl.dataset._prevDisplay = missesEl.style.display || "";
+        missesEl.style.display = "none";
+    }
+
     text.textContent = `Level ${level}`;
     overlay.classList.remove("hidden");
 
@@ -87,21 +95,33 @@ function showLevelAnnouncement(level, cb) {
     // keep visible for 1800ms, then hide and call callback
     setTimeout(() => {
         overlay.classList.add("hidden");
+
+        // restore previously stored display only if needed (updateUI/addDucks will set correct display)
+        if (level === 1 && missesEl) {
+            // clear stored value; updateUI will set the correct visibility when ducks are created
+            delete missesEl.dataset._prevDisplay;
+        }
+
         if (typeof cb === "function") cb();
     }, 1800);
 }
 
 // new: startRound handles showing level announcement at start of a level (round 1)
 function startRound() {
-    updateUI();
+    // do NOT call updateUI() before the level announcement for round 1 to avoid rendering misses early
     if (currentRound === 1) {
         showLevelAnnouncement(currentLevel, addDucks);
     } else {
+        updateUI();
         addDucks();
     }
 }
 
 window.onload = function () {
+    // ensure misses are hidden on initial load (will be shown after announcement/addDucks)
+    const missesEl = document.getElementById("misses");
+    if (missesEl) missesEl.style.display = "none";
+
     // replace initial addDucks with startRound so announcement shows on first level
     setTimeout(startRound, 2000); // Wait 2 seconds and then announce/start
     setInterval(moveDucks, 1000 / 60); // 60 frames per second
@@ -164,21 +184,27 @@ function updateUI() {
 
     // dynamic miss limit: levels 1-2 -> 3 misses, levels 3+ -> 5 misses
     const missLimit = currentLevel >= 3 ? 5 : 3;
-    // remaining hearts = missLimit - missesThisLevel (clamped >= 0)
     const remaining = Math.max(0, missLimit - (missesThisLevel || 0));
 
-    // render heart icons
+    // render heart icons and set visibility based on whether ducks exist
     if (missesContainer) {
-        missesContainer.innerHTML = "";
-        for (let i = 0; i < remaining; i++) {
-            const img = document.createElement("img");
-            img.className = "heart-icon";
-            img.src = "assets/images/duck-red-icon.png";
-            img.alt = "Life";
-            img.draggable = false;
-            missesContainer.appendChild(img);
+        if (!ducks || ducks.length === 0) {
+            missesContainer.style.display = "none";
+            missesContainer.innerHTML = "";
+        } else {
+            missesContainer.style.display = "flex";
+            missesContainer.innerHTML = "";
+            for (let i = 0; i < remaining; i++) {
+                const img = document.createElement("img");
+                img.className = "heart-icon";
+                img.src = "assets/images/duck-red-icon.png";
+                img.alt = "Life";
+                img.draggable = false;
+                missesContainer.appendChild(img);
+            }
         }
     }
+
     renderBullets(); // refresh bullets too
 }
 
@@ -204,8 +230,7 @@ function addDucks() {
     duckVelocityY = baseVelocityY * settings.speed;
 
     renderBullets();
-    updateUI();
-
+    // NOTE: do NOT call updateUI() here yet — updateUI will be called after ducks are created
     for (let i = 0; i < duckCount; i++) {
         let duckImageName = duckImageNames[Math.floor(Math.random() * 2)];
         let duckImage = document.createElement("img");
@@ -317,6 +342,9 @@ function addDucks() {
         }
         ducks.push(duck);
     }
+
+    // update UI now that ducks exist so misses will be rendered and made visible
+    updateUI();
     startQuackLoop();
 }
 
