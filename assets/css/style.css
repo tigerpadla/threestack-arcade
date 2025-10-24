@@ -20,6 +20,9 @@
         rgba(0, 240, 255, 0.15),
         rgba(255, 45, 212, 0.12)
     );
+    /* new: reserve space for fixed header/footer (adjust if needed) */
+    --header-height: 4rem;
+    --footer-height: 2.4rem;
 }
 
 body {
@@ -47,6 +50,34 @@ body {
     gap: 0.35rem;
     padding: 1rem 1rem;
     pointer-events: auto;
+    /* panel to separate header from busy background */
+    background: rgba(2, 6, 18, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    /* make full-width bar and remove rounded corners */
+    width: 100%;
+    left: 0;
+    right: 0;
+    border-radius: 0;
+    backdrop-filter: blur(6px);
+}
+
+/* On wide screens keep main centered but nudge header down by fixing it out of flow */
+@media (min-width: 1013px) {
+    .site-header {
+        position: fixed; /* remove from flow so main stays vertically centered */
+        left: 0;
+        right: 0;
+        width: 100%; /* full viewport width */
+        transform: none; /* no horizontal translate */
+        top: 0; /* align header to the top on wide screens */
+        padding: 0.6rem 1rem;
+        pointer-events: auto;
+        /* keep same panel when header is fixed */
+        background: rgba(2, 6, 18, 0.6);
+        border-radius: 0; /* no rounded corners */
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+        justify-content: center; /* center inner content */
+    }
 }
 
 .site-title {
@@ -54,8 +85,8 @@ body {
     color: #e9fbff;
     text-align: center;
     font-family: "Sixtyfour", "Press Start 2P", system-ui, sans-serif;
-    /* responsive font: slightly larger across devices */
-    font-size: clamp(1.25rem, 5.5vw, 2.75rem);
+    /* responsive font: larger across devices */
+    font-size: clamp(1.75rem, 6.5vw, 3.75rem);
     line-height: 1;
     letter-spacing: 0.08em;
     /* layered text shadows for depth and legibility */
@@ -84,7 +115,7 @@ body {
     }
     .site-title {
         /* mobile: make a bit larger for readability */
-        font-size: clamp(1rem, 8.5vw, 1.5rem);
+        font-size: clamp(1.25rem, 9.5vw, 2rem);
         padding: 0.2rem 0.45rem;
         letter-spacing: 0.04em;
     }
@@ -96,6 +127,9 @@ main {
     align-items: center; /* vertical centering */
     justify-content: center; /* horizontal centering */
     min-height: 0;
+    /* reserve space so centered content isn't hidden by fixed header/footer */
+    padding-top: calc(var(--header-height));
+    padding-bottom: calc(var(--footer-height) + 0.5rem);
 }
 
 /* Center the games area */
@@ -288,4 +322,33 @@ main {
             max-width: 100%;
         }
     }
+}
+
+/* Footer: centered small caption */
+.site-footer {
+    z-index: 2;
+    text-align: center;
+    padding: 0.9rem 1rem;
+    color: #bfefff;
+    font-family: "Press Start 2P", "Sixtyfour", system-ui, sans-serif;
+    font-size: clamp(0.55rem, 1.2vw, 0.75rem);
+    background: rgba(2, 6, 18, 0.55);
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    /* make footer fixed and visible without scrolling */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--footer-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem; /* horizontal padding only */
+    border-radius: 0; /* ensure no rounded corners */
+    box-shadow: none;
+}
+
+.footer-text {
+    margin: 0;
+    opacity: 0.95;
 }
