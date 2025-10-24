@@ -41,8 +41,10 @@ body {
     position: relative;
     z-index: 2; /* sits above the bg video */
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.35rem;
     padding: 1rem 1rem;
     pointer-events: auto;
 }
@@ -63,6 +65,17 @@ body {
     -webkit-text-stroke: 0.6px rgba(0, 0, 0, 0.6);
     /* extra drop shadow via filter for browsers that support it */
     filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.45));
+}
+
+.site-subtitle {
+    margin: 0.35rem 0 0.8rem;
+    font-family: "Press Start 2P", "Sixtyfour", system-ui, sans-serif;
+    font-size: clamp(0.6rem, 2.5vw, 0.9rem);
+    color: #bfefff;
+    text-align: center;
+    letter-spacing: 0.06em;
+    line-height: 1.05;
+    z-index: 2;
 }
 
 @media (max-width: 480px) {
@@ -199,6 +212,44 @@ main {
     .play-btn.pressed {
         transform: translateY(0) scale(0.995);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Creator link: GitHub icon + name */
+    .creator {
+        margin-top: 0.9rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .creator-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        text-decoration: none;
+        color: #bfefff;
+        transition: color 140ms ease, transform 120ms ease;
+    }
+
+    .creator-link:hover,
+    .creator-link:focus {
+        color: var(--neon-p);
+        transform: translateY(-2px);
+        outline: none;
+    }
+
+    .creator-icon {
+        width: 20px;
+        height: 20px;
+        display: block;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .creator-name {
+        font-size: 0.62rem;
+        letter-spacing: 0.06em;
+        font-family: "Press Start 2P", "Sixtyfour", system-ui, sans-serif;
+        white-space: nowrap;
     }
 
     /* Responsive tweaks */
