@@ -49,6 +49,23 @@ body {
     pointer-events: auto;
 }
 
+/* On wide screens keep main centered but nudge header down by fixing it out of flow */
+@media (min-width: 1013px) {
+    .site-header {
+        position: fixed; /* remove from flow so main stays vertically centered */
+        left: 50%;
+        transform: translateX(-50%); /* horizontally center */
+        top: clamp(
+            2.25rem,
+            8vh,
+            4rem
+        ); /* responsive vertical offset on wide screens */
+        padding: 0.6rem 1rem;
+        width: auto;
+        pointer-events: auto;
+    }
+}
+
 .site-title {
     margin: 0;
     color: #e9fbff;
@@ -288,4 +305,22 @@ main {
             max-width: 100%;
         }
     }
+}
+
+/* Footer: centered small caption */
+.site-footer {
+    z-index: 2;
+    text-align: center;
+    padding: 0.9rem 1rem;
+    color: #bfefff;
+    font-family: "Press Start 2P", "Sixtyfour", system-ui, sans-serif;
+    font-size: clamp(0.55rem, 1.2vw, 0.75rem);
+    background: transparent; /* ensure no background */
+    /* backdrop-filter removed to eliminate background blur */
+    pointer-events: auto;
+}
+
+.footer-text {
+    margin: 0;
+    opacity: 0.95;
 }
