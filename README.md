@@ -1,6 +1,6 @@
 # 🎮 ThreeStack Arcade
 
-![ThreeStack Hero Banner](assets/images/three-stack-hero.png)
+![ThreeStack Hero Banner](assets/images/threestack-arcade-hero.gif)
 
 **ThreeStack Arcade** is an arcade hub and your portal back to the ’80s built for a Code Institute Full‑Stack Bootcamp hackathon. The hub launches three mini-games (Action Stations, Duck 'Em Up, and Snake). This project demonstrates responsive front‑end design, accessible UX, modular CSS, and vanilla JavaScript focused on DOM manipulation, game loops, state management, and graceful error handling. 🕹️
 
