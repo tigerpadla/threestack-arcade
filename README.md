@@ -162,6 +162,35 @@ Key implementation details:
 
 ### Action Stations
 
+![assets/images/actionStations_gamePlay.png]
+
+Action Stations is a simplified clone of the classic game Battleship, depicting only one side of such a game. It was implemented as a single-page app and designed in such a way as to create the feeling of being in a cold-war era surface warship heading into combat, minimising the use of graphics and utilising a special pixel font to approximate the look of low-power computer systems of the era. Special attention was played to placing “environmental storytelling” elements on the game screen to allow the player to take a deeper dive into the game world without having this forced on them.
+
+- Key Implementation Details
+  - HTML
+    - Three-column structure for game board, message log and environmental lore
+    - 8x8 game board built using html table
+    - Manual target input field and dedicated “Fire” button
+    - Dedicated buttons trigger modal pop-ups that provide background lore as well as an explanation of symbols used in gameplay
+    - Inactive buttons included for environmental storytelling
+
+  - JavaScript
+    - Main functions: constructor(), generateShips(), generateShipLocations(), fire(), guess(), processGuess(), displayHit(), displayMiss(), displayMessage()
+    - Math.random() & Math.floor() used to randomise ship position & orientation
+    - Gameplay loop: Clicking on game board or entering coordinates and pressing “Fire” button triggers game to check targeted cell ID against known cell ID of target ship. A hit triggers   displayHit() function which displays the appropriate icon on the map, while a miss triggers displayMiss(), which display the icon for a missed shot. Both functions in turn trigger   displayMessage(), which gives text feedback that is shown to player in Message Log.
+    - Input: Mouse-based. Provision for keyboard input exists but requires further work
+
+  - CSS
+    - Bootstrap used for general layout
+    - Custom styling used to recreate 1980s-era computer appearance
+    - Bootstrap modals and buttons fitted with additional custom classes to ensure consistent appearance
+
+  - Design Statement
+    - Design deliberately minimalist to mimic a work station on a cold-war era warship
+    - Specific inspiration was drawn from Royal Navy Type 42 destroyers such as HMS Sheffield or HMS Liverpool, the player ship in Action Stations.
+    - Icons used to show hits and misses are drawn from NTDS (Navy Tactical Data System) symbology still used by navies of all NATO members as outlined in NATO STANAG 4420.
+    - Use of inactive buttons to indicate inoperable systems, as well as flavour text in Modals are used to create a WW3 ambience and provide in-universe justification for simply shooting at grid squares.
+
 
 ### Snake
 
