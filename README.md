@@ -4,7 +4,7 @@
 
 **ThreeStack Arcade** is an arcade hub and your portal back to the ’80s built for a Code Institute Full‑Stack Bootcamp hackathon. The hub launches three mini-games (Action Stations, Duck 'Em Up, and Snake). This project demonstrates responsive front‑end design, accessible UX, modular CSS, and vanilla JavaScript focused on DOM manipulation, game loops, state management, and graceful error handling. 🕹️
 
-[![GitHub Pages](https://tigerpadla.github.io/threestack-arcade/)](#)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-blue.svg)(https://tigerpadla.github.io/threestack-arcade/)](#)
 [![W3C HTML Validation](https://img.shields.io/badge/W3C-HTML5%20Valid-orange.svg)](assets/images/html-validation.png)
 [![Jigsaw CSS Validation](https://img.shields.io/badge/Jigsaw-CSS3%20Valid-blueviolet.svg)](assets/images/css-validation.png)
 
@@ -59,6 +59,7 @@ The hub provides clear game previews, keyboard and touch‑friendly controls, pe
 Must-have:
 - As a visitor, I want a simple hub to preview and launch games.  
 - As a player, I want responsive, non-blocking controls with visible feedback.  
+- As a player, I want an in-game HUD showing score so I can track progress.
 
 Should-have:
 - Persistent highscores for replay incentive.  
