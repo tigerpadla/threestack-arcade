@@ -20,6 +20,9 @@
         rgba(0, 240, 255, 0.15),
         rgba(255, 45, 212, 0.12)
     );
+    /* new: reserve space for fixed header/footer (adjust if needed) */
+    --header-height: 4rem;
+    --footer-height: 2.4rem;
 }
 
 body {
@@ -36,12 +39,97 @@ body {
     flex-direction: column;
 }
 
+/* Header: centered, responsive, above background video */
+.site-header {
+    position: relative;
+    z-index: 2; /* sits above the bg video */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 1rem 1rem;
+    pointer-events: auto;
+    /* panel to separate header from busy background */
+    background: rgba(2, 6, 18, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    /* make full-width bar and remove rounded corners */
+    width: 100%;
+    left: 0;
+    right: 0;
+    border-radius: 0;
+    backdrop-filter: blur(6px);
+}
+
+/* On wide screens keep main centered but nudge header down by fixing it out of flow */
+@media (min-width: 1013px) {
+    .site-header {
+        position: fixed; /* remove from flow so main stays vertically centered */
+        left: 0;
+        right: 0;
+        width: 100%; /* full viewport width */
+        transform: none; /* no horizontal translate */
+        top: 0; /* align header to the top on wide screens */
+        padding: 0.6rem 1rem;
+        pointer-events: auto;
+        /* keep same panel when header is fixed */
+        background: rgba(2, 6, 18, 0.6);
+        border-radius: 0; /* no rounded corners */
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+        justify-content: center; /* center inner content */
+    }
+}
+
+.site-title {
+    margin: 0;
+    color: #e9fbff;
+    text-align: center;
+    font-family: "Sixtyfour", "Press Start 2P", system-ui, sans-serif;
+    /* responsive font: larger across devices */
+    font-size: clamp(1.75rem, 6.5vw, 3.75rem);
+    line-height: 1;
+    letter-spacing: 0.08em;
+    /* layered text shadows for depth and legibility */
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85), 0 3px 8px rgba(0, 0, 0, 0.65),
+        0 0 14px rgba(0, 240, 255, 0.06);
+    /* subtle stroked outline for better contrast on bright backgrounds */
+    -webkit-text-stroke: 0.6px rgba(0, 0, 0, 0.6);
+    /* extra drop shadow via filter for browsers that support it */
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.45));
+}
+
+.site-subtitle {
+    margin: 0.35rem 0 0.8rem;
+    font-family: "Press Start 2P", "Sixtyfour", system-ui, sans-serif;
+    font-size: clamp(0.6rem, 2.5vw, 0.9rem);
+    color: #bfefff;
+    text-align: center;
+    letter-spacing: 0.06em;
+    line-height: 1.05;
+    z-index: 2;
+}
+
+@media (max-width: 480px) {
+    .site-header {
+        padding: 0.6rem 0.5rem;
+    }
+    .site-title {
+        /* mobile: make a bit larger for readability */
+        font-size: clamp(1.25rem, 9.5vw, 2rem);
+        padding: 0.2rem 0.45rem;
+        letter-spacing: 0.04em;
+    }
+}
+
 main {
     display: flex;
     flex: 1 1 auto; /* allow main to grow and occupy available vertical space */
     align-items: center; /* vertical centering */
     justify-content: center; /* horizontal centering */
     min-height: 0;
+    /* reserve space so centered content isn't hidden by fixed header/footer */
+    padding-top: calc(var(--header-height));
+    padding-bottom: calc(var(--footer-height) + 0.5rem);
 }
 
 /* Center the games area */
@@ -59,15 +147,18 @@ main {
     flex-direction: row;
     gap: 2rem;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
     width: auto;
     max-width: 1100px;
     padding: 0 1rem;
+    flex-wrap: wrap; /* allow wrapping on smaller screens */
 }
 
 /* Ensure each card has a consistent size in the row */
 .game-card {
-    flex: 0 0 260px; /* fixed card width in the row */
+    /* flexible card that can shrink/grow; keeps a sensible max width */
+    flex: 1 1 260px; /* base width 260px, but flexible */
+    max-width: 320px;
     background: var(--bg-tone);
     border: 2px solid rgba(255, 255, 255, 0.04);
     padding: 1rem;
@@ -101,10 +192,13 @@ main {
     opacity: 1;
 }
 
-/* Thumbnail */
-.game-thumb {
+/* Thumbnail (child selector) */
+.game-card .game-thumb {
     width: 100%;
-    height: 140px;
+    /* keep an aspect ratio so thumbnails scale nicely */
+    aspect-ratio: 16 / 9;
+    height: auto;
+    max-height: 220px; /* prevents extremely tall thumbnails on large screens */
     object-fit: cover;
     border-radius: 6px;
     display: block;
@@ -113,7 +207,7 @@ main {
 }
 
 /* Title */
-.game-title {
+.game-card .game-title {
     font-size: 0.7rem;
     color: #e6f7ff;
     margin: 0 0 1rem 0;
@@ -122,7 +216,7 @@ main {
 }
 
 /* Play button */
-.play-btn {
+.game-card .play-btn {
     display: inline-block;
     padding: 0.9rem 1.2rem;
     background: linear-gradient(
@@ -141,29 +235,69 @@ main {
     cursor: pointer;
 }
 
-.play-btn:hover,
-.play-btn:focus {
+.game-card .play-btn:hover,
+.game-card .play-btn:focus {
     transform: translateY(-3px);
     color: var(--neon-p);
     box-shadow: 0 10px 28px rgba(255, 45, 212, 0.12);
     outline: none;
 }
 
-.play-btn:active,
-.play-btn.pressed {
+.game-card .play-btn:active,
+.game-card .play-btn.pressed {
     transform: translateY(0) scale(0.995);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
 }
 
+/* Creator link: GitHub icon + name */
+.game-card .creator {
+    margin-top: 0.9rem;
+    display: flex;
+    justify-content: center;
+}
+
+.game-card .creator-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    text-decoration: none;
+    color: #bfefff;
+    transition: color 140ms ease, transform 120ms ease;
+}
+
+.game-card .creator-link:hover,
+.game-card .creator-link:focus {
+    color: var(--neon-p);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.game-card .creator-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.game-card .creator-name {
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    font-family: "Press Start 2P", "Sixtyfour", system-ui, sans-serif;
+    white-space: nowrap;
+}
+
 /* Responsive tweaks */
 @media (max-width: 480px) {
-    .game-thumb {
-        height: 110px;
+    .game-card .game-thumb {
+        /* slightly smaller max height on small devices */
+        aspect-ratio: 16 / 9;
+        max-height: 140px;
     }
-    .game-title {
+    .game-card .game-title {
         font-size: 0.6rem;
     }
-    .play-btn {
+    .game-card .play-btn {
         padding: 0.7rem 0.9rem;
         font-size: 0.6rem;
     }
@@ -188,4 +322,33 @@ main {
         flex: 1 1 calc(50% - 1rem);
         max-width: 100%;
     }
+}
+
+/* Footer: centered small caption */
+.site-footer {
+    z-index: 2;
+    text-align: center;
+    padding: 0.9rem 1rem;
+    color: #bfefff;
+    font-family: "Press Start 2P", "Sixtyfour", system-ui, sans-serif;
+    font-size: clamp(0.55rem, 1.2vw, 0.75rem);
+    background: rgba(2, 6, 18, 0.55);
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    /* make footer fixed and visible without scrolling */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--footer-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem; /* horizontal padding only */
+    border-radius: 0; /* ensure no rounded corners */
+    box-shadow: none;
+}
+
+.footer-text {
+    margin: 0;
+    opacity: 0.95;
 }
