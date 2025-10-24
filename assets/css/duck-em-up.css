@@ -1,3 +1,14 @@
+/* Duck 'Em Up — styles
+   Sections:
+     1. Base / Cursor
+     2. Variables (CSS custom properties)
+     3. Layout / HUD
+     4. Misses / Bullets
+     5. Overlays & Animations
+     6. Buttons & Utility
+*/
+
+/* 1) Base / Cursor */
 html,
 body {
     cursor: url("../images/duck-em-up-target.png"), auto;
@@ -21,34 +32,13 @@ body {
     src: url("../fonts/duck-em-up-font.otf");
 }
 
-#score {
-    font-size: clamp(20px, 5.2vw, 32px);
-    font-family: gameFont;
-    color: white;
-    margin: 0;
-    text-align: center;
-    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
-
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
-img {
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
+/* 2) Variables */
 :root {
     --scoreboard-padding-y: clamp(6px, 0.9vw, 14px);
     --scoreboard-icon-width: clamp(120px, 18vw, 200px);
 }
 
+/* 3) Layout / HUD */
 .scoreboard {
     position: fixed;
     top: 0;
@@ -95,6 +85,7 @@ img {
     pointer-events: none;
 }
 
+/* 4) Misses / Bullets */
 .header-misses {
     position: fixed;
     top: var(--scoreboard-padding-y);
@@ -119,36 +110,11 @@ img {
     pointer-events: none;
 }
 
-/* Heart / red duck icon (acts like health) */
 .miss-hearts .heart-icon {
     width: clamp(38px, 7.9vw, 84px);
     height: auto;
     display: block;
     user-select: none;
-}
-
-.dog-popup {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translate(-50%, 100%);
-    animation: dog-pop 2.2s ease-in-out forwards;
-    pointer-events: none;
-}
-
-@keyframes dog-pop {
-    0%,
-    100% {
-        transform: translate(-50%, 100%);
-    }
-    20%,
-    80% {
-        transform: translate(-50%, 0);
-    }
-}
-
-.duck-shot-image {
-    transform: scale(1.18);
 }
 
 #bullets {
@@ -169,6 +135,18 @@ img {
     opacity: 1;
     display: block;
     user-select: none;
+}
+
+/* 5) Overlays & Animations */
+/* Ensure the .hidden class controls visibility (JS toggles this class) */
+.level-announcement.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.level-announcement:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .level-announcement {
@@ -203,16 +181,6 @@ img {
     font-family: gameFont, sans-serif;
 }
 
-/* visible / hidden helpers */
-.level-announcement.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-.level-announcement:not(.hidden) {
-    opacity: 1;
-    pointer-events: auto;
-}
-
 @keyframes level-pop {
     0% {
         transform: translateY(24px) scale(0.96);
@@ -228,41 +196,63 @@ img {
     }
 }
 
-/* Restart button */
+/* Dog popup animation */
+.dog-popup {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    animation: dog-pop 2.2s ease-in-out forwards;
+    pointer-events: none;
+}
+@keyframes dog-pop {
+    0%,
+    100% {
+        transform: translate(-50%, 100%);
+    }
+    20%,
+    80% {
+        transform: translate(-50%, 0);
+    }
+}
+
+/* 6) Buttons & Utility */
+.duck-shot-image {
+    transform: scale(1.18);
+}
+
+/* Restart / play buttons */
 .level-announcement__content .game-over-button,
 .game-over-button {
     margin-top: 12px;
     padding: 6px 14px;
     font-family: gameFont, monospace;
     font-size: clamp(12px, 2.6vw, 18px);
-    color: #111; /* dark text on light button */
-    background: linear-gradient(#ffd966, #ffb300); /* simple two-tone */
-    border: 4px solid #111; /* thick dark border */
-    border-bottom-width: 8px; /* extra thickness to look 3D */
+    color: #111;
+    background: linear-gradient(#ffd966, #ffb300);
+    border: 4px solid #111;
+    border-bottom-width: 8px;
     border-right-width: 8px;
     border-radius: 4px;
     box-shadow: 0 8px 0 #000, inset 0 -2px 0 rgba(0, 0, 0, 0.08);
     cursor: pointer;
     pointer-events: auto;
-    image-rendering: pixelated; /* keep crisp edges on scaled displays */
+    image-rendering: pixelated;
     transition: transform 60ms linear, box-shadow 60ms linear;
 }
-
-/* Pressed effect */
 .game-over-button:active {
     transform: translateY(6px);
     box-shadow: 0 2px 0 #000;
     border-bottom-width: 4px;
     border-right-width: 4px;
 }
-
 .game-over-button:hover,
 .game-over-button:focus {
     filter: brightness(1.05);
     outline: none;
 }
 
-/* Global: prevent text selection/dragging and keep custom cursor */
+/* Prevent selection/dragging globally and keep custom cursor */
 *,
 *::before,
 *::after {
@@ -272,4 +262,17 @@ img {
     user-select: none !important;
     -webkit-user-drag: none !important;
     cursor: url("../images/duck-em-up-target.png"), auto !important;
+}
+
+/* Minimal reset for text and images */
+#score {
+    font-size: clamp(20px, 5.2vw, 32px);
+    font-family: gameFont;
+    color: white;
+    margin: 0;
+    text-align: center;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+}
+img {
+    user-select: none;
 }

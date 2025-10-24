@@ -23,6 +23,7 @@
 </head>
 
 <body>
+    <!-- HUD: Scoreboard, bullets and misses -->
     <header>
         <!-- Scoreboard and Bullets UI -->
         <div class="scoreboard" role="banner">
@@ -36,6 +37,7 @@
         <div id="misses" class="miss-hearts header-misses" aria-live="polite" aria-label="Misses left"></div>
     </header>
 
+    <!-- Overlays: Level announcement, Game Over, Game Complete -->
     <!-- Level announcement overlay -->
     <div id="level-announcement" class="level-announcement hidden" aria-live="polite" role="status">
         <div class="level-announcement__content">
@@ -63,14 +65,14 @@
     </div>
 
     <main>
-        <!-- place main content here -->
+        <!-- gameplay is handled by JS; ducks are appended to <body> -->
     </main>
 
     <footer>
-        <!-- place footer here -->
+        <!-- static footer area (kept minimal for gameplay) -->
     </footer>
 
-    <!-- JavaScript -->
+    <!-- Script -->
     <script src="assets/js/duck-em-up.js"></script>
 </body>
 

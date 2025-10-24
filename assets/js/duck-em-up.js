@@ -1,6 +1,21 @@
+/* jshint esversion: 6, loopfunc: true */
+/*
+ Duck 'Em Up — main game script
+ Sections:
+  - Constants & state
+  - Utility helpers
+  - UI rendering and overlays
+  - Duck creation & movement (game loop)
+  - Round / level control and end-of-round UI
+  - Event handlers / initialization
+*/
+
+/* -------------------------
+   Constants & game state
+   ------------------------- */
 let ducks;
 let duckCount = 1;
-let duckImageNames = [
+const duckImageNames = [
     "assets/images/duck-left.gif",
     "assets/images/duck-right.gif",
 ];
@@ -15,6 +30,8 @@ let gameHeight = (window.screen.height * 3) / 4;
 let score = 0;
 let quackTimer = null;
 
+let overlayClickHandler = null;
+
 let bullets = 0;
 let roundEndedWithLaugh = false;
 
@@ -25,36 +42,40 @@ const maxLevels = 5;
 let missesThisLevel = 0;
 
 const levelSettings = [
-    /* level 1 */ { min: 1, max: 3, speed: 1 }, // Normal
-    /* level 2 */ { min: 2, max: 5, speed: 1 }, // Normal
-    /* level 3 */ { min: 3, max: 7, speed: 1.2 }, // Slower Fast
-    /* level 4 */ { min: 5, max: 8, speed: 1.4 }, // Slower Fast+
-    /* level 5 */ { min: 8, max: 10, speed: 1.6 }, // Slower Very Fast
+    { min: 1, max: 3, speed: 1 },
+    { min: 2, max: 5, speed: 1 },
+    { min: 3, max: 7, speed: 1.2 },
+    { min: 5, max: 8, speed: 1.4 },
+    { min: 8, max: 10, speed: 1.6 },
 ];
 
 const baseVelocityX = 5;
 const baseVelocityY = 5;
 
+/* -------------------------
+   Utility helpers
+   ------------------------- */
 function randomDelay(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function randomPosition(limit) {
+    return Math.floor(Math.random() * limit);
+}
+
+/* -------------------------
+   Sounds / quack loop
+   ------------------------- */
 function startQuackLoop() {
-    if (quackTimer || !ducks || ducks.length === 0) {
-        return;
-    }
+    if (quackTimer || !ducks || ducks.length === 0) return;
 
     quackTimer = setTimeout(() => {
         quackTimer = null;
-
         const flyingDucks = ducks.filter((duck) => duck.state === "flying");
         if (flyingDucks.length > 0) {
             new Audio("assets/sounds/duck-quack.mp3").play();
         }
-
-        if (ducks.length > 0) {
-            startQuackLoop();
-        }
+        if (ducks.length > 0) startQuackLoop();
     }, randomDelay(2500, 5000));
 }
 
@@ -65,227 +86,121 @@ function stopQuackLoop() {
     }
 }
 
-function showLevelAnnouncement(level, cb) {
-    const overlay = document.getElementById("level-announcement");
-    const text = document.getElementById("announcement-text");
-    if (!overlay || !text) {
-        if (typeof cb === "function") cb();
-        return;
-    }
-
-    // Ensure misses are hidden during the Level 1 announcement
-    const missesEl = document.getElementById("misses");
-    if (level === 1 && missesEl) {
-        missesEl.dataset._prevDisplay = missesEl.style.display || "";
-        missesEl.style.display = "none";
-    }
-
-    text.textContent = `Level ${level}`;
-    overlay.classList.remove("hidden");
-
-    if (level > 1) {
-        new Audio("assets/sounds/duck-em-up-level-complete.mp3").play();
-    }
-
-    // keep visible for 1800ms, then hide and call callback
-    setTimeout(() => {
-        overlay.classList.add("hidden");
-
-        // restore previously stored display only if needed (updateUI/addDucks will set correct display)
-        if (level === 1 && missesEl) {
-            // clear stored value; updateUI will set the correct visibility when ducks are created
-            delete missesEl.dataset._prevDisplay;
-        }
-
-        if (typeof cb === "function") cb();
-    }, 1800);
-}
-
-// new: startRound handles showing level announcement at start of a level (round 1)
-function startRound() {
-    // do NOT call updateUI() before the level announcement for round 1 to avoid rendering misses early
-    if (currentRound === 1) {
-        showLevelAnnouncement(currentLevel, addDucks);
-    } else {
-        updateUI();
-        addDucks();
+/* -------------------------
+   UI rendering (score, bullets, misses)
+   ------------------------- */
+function renderBullets() {
+    const container = document.getElementById("bullets");
+    if (!container) return;
+    container.innerHTML = "";
+    for (let i = 0; i < bullets; i++) {
+        const b = document.createElement("img");
+        b.classList.add("bullet-icon");
+        b.src = "assets/images/duck-em-up-bullet.png";
+        b.draggable = false;
+        container.appendChild(b);
     }
 }
-
-window.onload = function () {
-    // ensure misses are hidden on initial load (will be shown after announcement/addDucks)
-    const missesEl = document.getElementById("misses");
-    if (missesEl) missesEl.style.display = "none";
-
-    // replace initial addDucks with startRound so announcement shows on first level
-    setTimeout(startRound, 2000); // Wait 2 seconds and then announce/start
-    setInterval(moveDucks, 1000 / 60); // 60 frames per second
-
-    // Miss-click handler: clicking anywhere that's not a duck consumes a bullet
-    document.addEventListener("click", function (e) {
-        // if no ducks or no bullets, nothing to do
-        if (!ducks || ducks.length === 0 || bullets <= 0) {
-            return;
-        }
-        // If click target is a duck (has class 'duck'), it's a hit and handled separately.
-        if (
-            e.target &&
-            e.target.classList &&
-            e.target.classList.contains("duck")
-        ) {
-            return;
-        }
-        // Also ignore clicks on scoreboard area
-        let scoreboard = document.querySelector(".scoreboard");
-        if (scoreboard && scoreboard.contains(e.target)) {
-            return;
-        }
-
-        // Miss: consume one bullet and update UI
-        bullets = Math.max(0, bullets - 1);
-        renderBullets();
-
-        // play shooting sound even on misses
-        new Audio("assets/sounds/duck-shot.mp3").play();
-
-        // If bullets run out while ducks remain -> make remaining ducks fly away upward
-        if (bullets === 0 && ducks && ducks.length > 0) {
-            roundEndedWithLaugh = true;
-            // set remaining non-shot/non-falling ducks to fly away
-            ducks.forEach((d) => {
-                if (d.state === "flying") {
-                    d.state = "flyingAway";
-                    // give a strong upward velocity
-                    d.velocityY = -10;
-                    // optionally reduce horizontal movement while fleeing upward
-                    d.velocityX = d.velocityX * 0.2;
-
-                    // count this duck as missed immediately so hearts disappear now
-                    missesThisLevel = (missesThisLevel || 0) + 1;
-                }
-            });
-            updateUI(); // reflect missed hearts immediately
-            stopQuackLoop();
-        }
-    });
-};
 
 function updateUI() {
     const scoreEl = document.getElementById("score");
     const missesContainer = document.getElementById("misses");
 
-    // update score
     if (scoreEl) scoreEl.textContent = score;
 
-    // dynamic miss limit: levels 1-2 -> 3 misses, levels 3+ -> 5 misses
     const missLimit = currentLevel >= 3 ? 5 : 3;
     const remaining = Math.max(0, missLimit - (missesThisLevel || 0));
 
-    // render heart icons and set visibility based on whether ducks exist
-    if (missesContainer) {
-        if (!ducks || ducks.length === 0) {
-            missesContainer.style.display = "none";
-            missesContainer.innerHTML = "";
-        } else {
-            missesContainer.style.display = "flex";
-            missesContainer.innerHTML = "";
-            for (let i = 0; i < remaining; i++) {
-                const img = document.createElement("img");
-                img.className = "heart-icon";
-                img.src = "assets/images/duck-red-icon.png";
-                img.alt = "Life";
-                img.draggable = false;
-                missesContainer.appendChild(img);
-            }
+    if (!missesContainer) {
+        renderBullets();
+        return;
+    }
+
+    if (!ducks || ducks.length === 0) {
+        missesContainer.style.display = "none";
+        missesContainer.innerHTML = "";
+    } else {
+        missesContainer.style.display = "flex";
+        missesContainer.innerHTML = "";
+        for (let i = 0; i < remaining; i++) {
+            const img = document.createElement("img");
+            img.className = "heart-icon";
+            img.src = "assets/images/duck-red-icon.png";
+            img.alt = "Life";
+            img.draggable = false;
+            missesContainer.appendChild(img);
         }
     }
 
-    renderBullets(); // refresh bullets too
+    renderBullets();
 }
 
+/* -------------------------
+   Duck creation & movement
+   ------------------------- */
 function addDucks() {
     ducks = [];
 
-    // pick settings for current level
     const settings =
         levelSettings[
             Math.max(0, Math.min(levelSettings.length - 1, currentLevel - 1))
         ];
-    // random duck count based on level
     duckCount =
         Math.floor(Math.random() * (settings.max - settings.min + 1)) +
         settings.min;
 
-    // bullets = duckCount + 1
     bullets = duckCount + 1;
-    // reset round-ended flag when starting/continuing rounds
     roundEndedWithLaugh = false;
-    // apply speed multipliers
     duckVelocityX = baseVelocityX * settings.speed;
     duckVelocityY = baseVelocityY * settings.speed;
 
     renderBullets();
-    // NOTE: do NOT call updateUI() here yet — updateUI will be called after ducks are created
+
     for (let i = 0; i < duckCount; i++) {
-        let duckImageName = duckImageNames[Math.floor(Math.random() * 2)];
-        let duckImage = document.createElement("img");
+        const duckImageName = duckImageNames[Math.floor(Math.random() * 2)];
+        const duckImage = document.createElement("img");
         duckImage.src = duckImageName;
         duckImage.width = duckWidth;
         duckImage.height = duckHeight;
         duckImage.draggable = false;
         duckImage.style.position = "absolute";
         duckImage.dataset.state = "flying";
-
-        // mark as duck so miss handler can ignore hits
         duckImage.classList.add("duck");
 
+        // click handler for the duck image (scoped to this duck element)
         duckImage.onclick = function (event) {
-            // prevent document-level miss handler from running
-            if (event && event.stopPropagation) {
-                event.stopPropagation();
-            }
+            if (event && event.stopPropagation) event.stopPropagation();
 
             if (
                 this.dataset.state === "shot" ||
                 this.dataset.state === "falling"
-            ) {
+            )
                 return;
-            }
-            const duckEntry = ducks.find((entry) => entry.image === this);
-            if (!duckEntry) {
-                return;
-            }
 
-            // consume one bullet for this shot and update UI
+            const duckEntry = ducks.find((entry) => entry.image === this);
+            if (!duckEntry) return;
+
             bullets = Math.max(0, bullets - 1);
             renderBullets();
 
-            // play shot sound and update score
             new Audio("assets/sounds/duck-shot.mp3").play();
             score += 1;
-            document.getElementById("score").innerHTML = score;
+            const scoreNode = document.getElementById("score");
+            if (scoreNode) scoreNode.innerHTML = score;
 
-            // Show "shot" image briefly before falling
-            // Set state to 'shot' and apply visual class
             this.dataset.state = "shot";
             duckEntry.state = "shot";
             this.classList.add("duck-shot-image");
-            // immediately show the static shot image
             this.src = "assets/images/duck-shot.png";
-            // stop horizontal motion immediately
             duckEntry.velocityX = 0;
             duckEntry.velocityY = 0;
 
-            // after a short delay, transition to falling (same as previous falling logic)
             setTimeout(() => {
-                // ensure duck still exists and is in 'shot' state
                 if (!duckEntry || duckEntry.state !== "shot") return;
 
-                // transition to falling
                 this.dataset.state = "falling";
                 duckEntry.state = "falling";
 
-                // initialize falling physics & play fall audio
                 duckEntry.fallVelocity = 6;
                 duckEntry.maxFallVelocity = 20;
                 duckEntry.gravity = 0.9;
@@ -293,11 +208,9 @@ function addDucks() {
                 duckEntry.fallAudio.loop = true;
                 duckEntry.fallAudio.play();
 
-                // set fall image immediately and remove shot-image class
                 this.classList.remove("duck-shot-image");
                 this.src = "assets/images/duck-fall.gif";
 
-                // If bullets ran out and there are still flying ducks, make them fly away
                 const flyingDucks = ducks.filter((d) => d.state === "flying");
                 if (bullets === 0 && flyingDucks.length > 0) {
                     roundEndedWithLaugh = true;
@@ -305,19 +218,17 @@ function addDucks() {
                         d.state = "flyingAway";
                         d.velocityY = -10;
                         d.velocityX = (d.velocityX || 0) * 0.2;
-
-                        // count misses immediately for each fleeing duck
                         missesThisLevel = (missesThisLevel || 0) + 1;
                     });
-                    updateUI(); // update hearts right away
+                    updateUI();
                     stopQuackLoop();
-                    return;
                 }
             }, 200);
         };
+
         document.body.appendChild(duckImage);
 
-        let duck = {
+        const duck = {
             image: duckImage,
             x: randomPosition(gameWidth - duckWidth),
             y: randomPosition(gameHeight - duckHeight),
@@ -329,30 +240,26 @@ function addDucks() {
             gravity: 0,
             fallAudio: null,
         };
-        duck.image.style.left = String(duck.x) + "px"; // X position
-        duck.image.style.top = String(duck.y) + "px"; // Y Position
+
+        duck.image.style.left = String(duck.x) + "px";
+        duck.image.style.top = String(duck.y) + "px";
 
         if (duck.image.src.includes(duckImageNames[0])) {
-            duck.velocityX = -duckVelocityX; // Going left
+            duck.velocityX = -duckVelocityX;
         }
         ducks.push(duck);
     }
 
-    // update UI now that ducks exist so misses will be rendered and made visible
     updateUI();
     startQuackLoop();
 }
 
 function moveDucks() {
     for (let i = ducks.length - 1; i >= 0; i--) {
-        let duck = ducks[i];
+        const duck = ducks[i];
 
-        // handle already-shot (static) ducks
-        if (duck.state === "shot") {
-            continue;
-        }
+        if (duck.state === "shot") continue;
 
-        // handle falling ducks
         if (duck.state === "falling") {
             duck.fallVelocity = Math.min(
                 (duck.fallVelocity || 0) + (duck.gravity || 0),
@@ -387,28 +294,20 @@ function moveDucks() {
             continue;
         }
 
-        // handle flying-away ducks (when bullets ran out)
         if (duck.state === "flyingAway") {
-            // move upwards
             duck.y += duck.velocityY;
-            // increase upward speed (more negative)
             duck.velocityY = (duck.velocityY || -4) - 0.5;
-            // optional small horizontal drift
             duck.x += (duck.velocityX || 0) * 0.1;
 
-            // update position
             duck.image.style.top = `${duck.y}px`;
             duck.image.style.left = `${duck.x}px`;
 
-            // if duck has flown beyond the top of the game area, remove it
             if (duck.y + duckHeight < 0) {
-                // removal only — miss was already counted when duck began flying away
                 if (duck.image.parentElement) {
                     duck.image.parentElement.removeChild(duck.image);
                 }
                 ducks.splice(i, 1);
 
-                // when last duck removed decide next action
                 if (ducks.length === 0) {
                     endRound();
                     roundEndedWithLaugh = false;
@@ -434,68 +333,120 @@ function moveDucks() {
     }
 }
 
-// replace direct calls to addDog/addDogLaugh when ducks run out with centralized endRound()
+/* -------------------------
+   Round / level control
+   ------------------------- */
 function endRound() {
     stopQuackLoop();
 
-    // show appropriate popup
     if (roundEndedWithLaugh) {
         addDogLaugh();
     } else {
         addDog(duckCount);
     }
 
-    // after popup delay, decide next action
     setTimeout(() => {
-        // dynamic miss limit: levels 1-2 -> 3 misses, levels 3+ -> 5 misses
         const missLimit = currentLevel >= 3 ? 5 : 3;
 
-        // if player missed missLimit or more ducks in this level -> game over
         if (missesThisLevel >= missLimit) {
             gameOver();
             return;
         }
 
-        // advance round or level
         if (currentRound < roundsPerLevel) {
             currentRound++;
         } else {
-            // finished this level
             if (currentLevel < maxLevels) {
                 currentLevel++;
             } else {
-                // completed all levels
                 gameComplete();
                 return;
             }
-            // reset rounds/misses for new level
             currentRound = 1;
             missesThisLevel = 0;
         }
         updateUI();
-        // start next round via startRound() so level announcement runs when needed
         startRound();
     }, 3000);
 }
 
 function gameOver() {
-    // show Game Over overlay and let player restart manually
     showGameOverAnnouncement();
 }
 
 function gameComplete() {
-    // show a brief "Congrats" announcement with final score, then restart game
     showGameCompleteAnnouncement();
 }
 
-// new: show game-complete announcement and wait for player to restart via button
+/* -------------------------
+   Overlays / popups
+   ------------------------- */
+
+/* Helper: attach a one-time click handler so clicking anywhere while an overlay is visible reloads the page */
+function attachOverlayClickReload() {
+    // ensure no duplicate handlers
+    removeOverlayClickHandler();
+    overlayClickHandler = function () {
+        window.location.reload();
+    };
+    // Use capture + once to ensure the handler fires and is removed immediately
+    document.addEventListener("click", overlayClickHandler, {
+        once: true,
+        capture: true,
+    });
+}
+
+/* Helper: remove the overlay click handler if present */
+function removeOverlayClickHandler() {
+    if (!overlayClickHandler) return;
+    // remove with same capture option
+    try {
+        document.removeEventListener("click", overlayClickHandler, {
+            capture: true,
+        });
+    } catch (_) {
+        // some environments may not accept option object in removeEventListener; try boolean fallback
+        document.removeEventListener("click", overlayClickHandler, true);
+    }
+    overlayClickHandler = null;
+}
+
+function showLevelAnnouncement(level, cb) {
+    const overlay = document.getElementById("level-announcement");
+    const text = document.getElementById("announcement-text");
+    if (!overlay || !text) {
+        if (typeof cb === "function") cb();
+        return;
+    }
+
+    const missesEl = document.getElementById("misses");
+    if (level === 1 && missesEl) {
+        missesEl.dataset._prevDisplay = missesEl.style.display || "";
+        missesEl.style.display = "none";
+    }
+
+    text.textContent = `Level ${level}`;
+    overlay.classList.remove("hidden");
+
+    if (level > 1) {
+        new Audio("assets/sounds/duck-em-up-level-complete.mp3").play();
+    }
+
+    setTimeout(() => {
+        overlay.classList.add("hidden");
+        if (level === 1 && missesEl) {
+            delete missesEl.dataset._prevDisplay;
+        }
+        if (typeof cb === "function") cb();
+    }, 1800);
+}
+
 function showGameCompleteAnnouncement() {
     const overlay = document.getElementById("game-complete-announcement");
     const scoreEl = document.getElementById("final-score");
     const playBtn = document.getElementById("game-complete-play");
 
     if (!overlay) {
-        // fallback: reset game if overlay missing
         currentLevel = 1;
         currentRound = 1;
         missesThisLevel = 0;
@@ -507,31 +458,51 @@ function showGameCompleteAnnouncement() {
         return;
     }
 
-    // update score text and show overlay (do NOT auto-hide)
     if (scoreEl) scoreEl.textContent = String(score);
     overlay.classList.remove("hidden");
 
-    // play completion sound on popup
+    // Attach global click-to-reload while overlay is visible
+    attachOverlayClickReload();
+
     try {
         const completeSfx = new Audio("assets/sounds/duck-em-up-game-over.mp3");
         completeSfx.play();
-    } catch (_) {
-        // ignore autoplay errors
-    }
+    } catch (_) {}
 
-    // ensure single handler: replace node to remove any previous listeners, then attach reload
     if (playBtn) {
         const newBtn = playBtn.cloneNode(true);
         playBtn.parentNode.replaceChild(newBtn, playBtn);
-        newBtn.addEventListener("click", () => {
-            // reload the page to restart the game
-            window.location.reload();
-        });
+        newBtn.addEventListener("click", () => window.location.reload());
     }
 }
 
+function showGameOverAnnouncement() {
+    const overlay = document.getElementById("game-over-announcement");
+    const restartBtn = document.getElementById("game-over-restart");
+    if (!overlay) return;
+
+    overlay.classList.remove("hidden");
+
+    // Attach global click-to-reload while overlay is visible
+    attachOverlayClickReload();
+
+    try {
+        const failSfx = new Audio("assets/sounds/duck-em-up-fail.mp3");
+        failSfx.play();
+    } catch (_) {}
+
+    if (restartBtn) {
+        const newBtn = restartBtn.cloneNode(true);
+        restartBtn.parentNode.replaceChild(newBtn, restartBtn);
+        newBtn.addEventListener("click", () => window.location.reload());
+    }
+}
+
+/* -------------------------
+   Utility visuals (dog popups)
+   ------------------------- */
 function addDog(duckCount) {
-    let dogImage = document.createElement("img");
+    const dogImage = document.createElement("img");
     dogImage.classList.add("dog-popup");
     if (duckCount === 1) {
         dogImage.src = "assets/images/dog-duck1.png";
@@ -547,13 +518,12 @@ function addDog(duckCount) {
         dogImage.height = 264;
     }
     dogImage.draggable = false;
-
     dogImage.style.position = "fixed";
     dogImage.style.bottom = "0px";
     dogImage.style.left = "50%";
     document.body.appendChild(dogImage);
 
-    let dogScoreSound = new Audio("assets/sounds/dog-score.mp3");
+    const dogScoreSound = new Audio("assets/sounds/dog-score.mp3");
     dogScoreSound.play();
 
     setTimeout(function () {
@@ -562,19 +532,18 @@ function addDog(duckCount) {
 }
 
 function addDogLaugh() {
-    let dogImage = document.createElement("img");
+    const dogImage = document.createElement("img");
     dogImage.classList.add("dog-popup");
     dogImage.src = "assets/images/dog-laugh.gif";
     dogImage.width = 150;
     dogImage.height = 210;
     dogImage.draggable = false;
-
     dogImage.style.position = "fixed";
     dogImage.style.bottom = "0px";
     dogImage.style.left = "50%";
     document.body.appendChild(dogImage);
 
-    let dogLaughSound = new Audio("assets/sounds/dog-laugh.mp3");
+    const dogLaughSound = new Audio("assets/sounds/dog-laugh.mp3");
     dogLaughSound.play();
 
     setTimeout(function () {
@@ -582,50 +551,59 @@ function addDogLaugh() {
     }, 3000);
 }
 
-// render bullets as icons
-function renderBullets() {
-    let container = document.getElementById("bullets");
-    if (!container) return;
-    container.innerHTML = "";
-    for (let i = 0; i < bullets; i++) {
-        let b = document.createElement("img");
-        b.classList.add("bullet-icon");
-        b.src = "assets/images/duck-em-up-bullet.png";
-        b.draggable = false;
-        container.appendChild(b);
+/* -------------------------
+   Round starter
+   ------------------------- */
+function startRound() {
+    if (currentRound === 1) {
+        showLevelAnnouncement(currentLevel, addDucks);
+    } else {
+        updateUI();
+        addDucks();
     }
 }
 
-function randomPosition(limit) {
-    return Math.floor(Math.random() * limit);
-}
+/* -------------------------
+   Initialization & event handlers
+   ------------------------- */
+window.onload = function () {
+    const missesEl = document.getElementById("misses");
+    if (missesEl) missesEl.style.display = "none";
 
-// ensure UI initialised
+    setTimeout(startRound, 2000);
+    setInterval(moveDucks, 1000 / 60);
+
+    document.addEventListener("click", function (e) {
+        if (!ducks || ducks.length === 0 || bullets <= 0) return;
+
+        if (
+            e.target &&
+            e.target.classList &&
+            e.target.classList.contains("duck")
+        )
+            return;
+
+        const scoreboard = document.querySelector(".scoreboard");
+        if (scoreboard && scoreboard.contains(e.target)) return;
+
+        bullets = Math.max(0, bullets - 1);
+        renderBullets();
+        new Audio("assets/sounds/duck-shot.mp3").play();
+
+        if (bullets === 0 && ducks && ducks.length > 0) {
+            roundEndedWithLaugh = true;
+            ducks.forEach((d) => {
+                if (d.state === "flying") {
+                    d.state = "flyingAway";
+                    d.velocityY = -10;
+                    d.velocityX = d.velocityX * 0.2;
+                    missesThisLevel = (missesThisLevel || 0) + 1;
+                }
+            });
+            updateUI();
+            stopQuackLoop();
+        }
+    });
+};
+
 window.addEventListener("load", updateUI);
-
-// new: show game-over announcement and hook restart button
-function showGameOverAnnouncement() {
-    const overlay = document.getElementById("game-over-announcement");
-    const restartBtn = document.getElementById("game-over-restart");
-    if (!overlay) return;
-
-    overlay.classList.remove("hidden");
-
-    // play fail sound when game over pops up
-    try {
-        const failSfx = new Audio("assets/sounds/duck-em-up-fail.mp3");
-        failSfx.play();
-    } catch (_) {
-        // ignore autoplay errors
-    }
-
-    // ensure single handler: replace with a fresh node then attach simple reload
-    if (restartBtn) {
-        const newBtn = restartBtn.cloneNode(true);
-        restartBtn.parentNode.replaceChild(newBtn, restartBtn);
-        newBtn.addEventListener("click", () => {
-            // reload the page to restart the game
-            window.location.reload();
-        });
-    }
-}
