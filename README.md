@@ -121,9 +121,88 @@ Retro-arcade aesthetic with modern, minimal UI so gameplay remains the focus.
 
 ### Duck Em Up
 
+Duck 'Em Up is a fast-paced Duck Hunt–style browser shooter built with semantic HTML for overlays and HUD, modular CSS for visual styling and animations, and vanilla JavaScript for game logic and audio. Players click or tap ducks to shoot them, conserve bullets, and avoid misses - rounds are grouped into levels with progressive difficulty and simple physics for falling ducks.
+
+![Duck 'Em Up Preview](assets/images/duck-em-up-preview.png)
+
+Key implementation details:
+- HTML
+  - Structured overlays for Level announcements, Game Over and Game Complete (accessible via aria-live and role attributes).
+  - Scoreboard and bullets UI placed in a fixed header-like element for consistent visibility.
+  - Duck images appended dynamically to the document body so clicks/touches are handled naturally, and a restart button is provided in overlays.
+
+- JavaScript
+  - Modular functions: addDucks(), moveDucks(), updateUI(), renderBullets(), endRound(), gameOver(), gameComplete(), startRound(), etc.
+  - Duck state machine: "flying", "shot", "falling", "flyingAway" with different behaviours (velocity, fall physics, audio).
+  - Level/round progression using levelSettings (duck count and speed multipliers), roundsPerLevel, and dynamic miss limits.
+  - Sound design: shot, quack, fall, land, dog reactions and SFX play with graceful handling for autoplay errors.
+  - Input handling: click/tap to shoot, document-level miss handling (consumes bullets), UI buttons for restart and play again.
+  - Persistence/UX: score shown in UI; overlays prevent premature rendering of miss hearts during level intro.
+
+- CSS
+  - Fixed scoreboard and bullet icons with responsive sizing variables and pixelated/retro visual choices.
+  - Level announcement and game-over overlays with entrance animations and accessible visibility toggles (.hidden).
+  - Dog popups and duck fall/shot visual treatments via classes and keyframes.
+  - Custom cursor and global user-select/user-drag prevention for a polished arcade feel.
+
+- Assets
+  - Images: flying ducks, static shot/fall images, dog animations, HUD icons.
+  - Sounds: duck-quack.mp3, duck-shot.mp3, duck-fall.mp3, duck-land.mp3, dog-laugh.mp3, dog-score.mp3, level-complete/game-over SFX.
+
+- Accessibility & UX
+  - aria-live used for announcements so screen readers announce level/game state changes.
+  - Overlays use role="status"/role="alert" appropriately and buttons are keyboard-focusable.
+  - Touch and mouse support: on-screen clicks/taps are primary control; clicks on non-duck areas count as misses and consume bullets to mirror classic gameplay.
+
+- Behaviour notes
+  - Bullets are set to duckCount + 1 each round; if bullets run out while ducks remain, remaining ducks flee upward ("flyingAway") and are counted as misses.
+  - When ducks are shot, a short "shot" sprite is displayed before transitioning to a falling animation and physics-based descent.
+  - Rounds and levels progress automatically; game over and completion overlays provide restart controls.
+
+
 ### Action Stations
 
+
 ### Snake
+
+Snake is a classic browser game built with **HTML**, **CSS**, and **JavaScript**, rendered on a 32×32 grid. Players control the snake with arrow keys (or on-screen buttons) to eat food, grow longer, and avoid colliding with walls or itself. The game demonstrates dynamic DOM manipulation, grid-based movement logic, modular architecture, and responsive design. 🍎
+
+![Snake Preview](assets/images/snake-thumbnail.png)
+
+Key implementation details:
+- HTML
+  - Semantic structure with container for grid and UI (scoreboard, game messages).
+  - ARIA labels for accessibility and focusable controls.
+  - Modular sections separated for readability and maintainability.
+
+- JavaScript
+  - Grid system: 32×32 layout represented as arrays of `{ x, y }` coordinates.
+  - Snake logic: movement updates the array, collision detection, growth when eating food.
+  - Game loop: updates position, renders snake segments, detects collisions.
+  - Event handling: arrow keys and optional on-screen buttons.
+  - LocalStorage used for high score persistence.
+  - Functions modularized: `moveSnake()`, `generateFood()`, `detectCollision()`, `updateScore()`, `resetGame()`, etc.
+
+- CSS
+  - CSS Grid for the board (`grid-template-columns` & `grid-template-rows`).
+  - Pixel-art ready styling for snake, food, and background.
+  - Directional classes for snake head, body, and tail for proper rotation.
+  - Responsive design and visual feedback for collisions and food consumption.
+
+- Assets
+  - Optional pixel art sprites for snake segments and food.
+  - Background images or color schemes stored in `assets/images/`.
+
+- Accessibility & UX
+  - Keyboard-friendly controls with visual focus indicators.
+  - High contrast pixel graphics for visibility.
+  - Scoreboard is clearly displayed with real-time updates.
+
+- Behaviour notes
+  - Snake moves continuously on a grid; player changes direction with keys.
+  - Eating food grows the snake and increments the score.
+  - Collision with wall or self ends the game and shows reset option.
+  - Game reset restores grid and snake to initial state.
 
 ---
 
