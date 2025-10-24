@@ -38,7 +38,7 @@
 
 ## Project Overview
 
-This project serves as a portfolio piece demonstrating proficiency in front‑end web development technologies. The goal was to build a polished, accessible, and fully responsive single‑page arcade hub that launches three mini‑games each showcasing semantic HTML, modular CSS, and vanilla JavaScript focused on DOM manipulation, game loops, state management, and graceful error handling.
+This project serves as a portfolio piece developed in collaboration showcasing the practical application of JavaScript and the full range of skills developed so far throughout the course. It’s a polished, accessible, and fully responsive single-page arcade hub that brings together three custom-built mini-games. Each game highlights key JavaScript concepts such as DOM manipulation, game loops, state management, and error handling, supported by semantic HTML and modular CSS for a smooth, consistent, and engaging player experience.
 
 The hub provides clear game previews, touch‑friendly controls and a consistent visual design to guide users from discovery to gameplay.
 
@@ -98,10 +98,10 @@ Retro-arcade aesthetic with modern, minimal UI so gameplay remains the focus.
 
 ### Typography
 
--   Clear, large headings and comfortable line heights.
+Clear, large headings and comfortable line heights.
 
-*   [**Sixtyfour**](https://fonts.google.com/specimen/Sixtyfour)
-*   [**Press Start 2P**](https://fonts.google.com/specimen/Press+Start+2P)
+-   [**Sixtyfour**](https://fonts.google.com/specimen/Sixtyfour)
+-   [**Press Start 2P**](https://fonts.google.com/specimen/Press+Start+2P)
 
 ### Imagery
 
@@ -115,7 +115,7 @@ Retro-arcade aesthetic with modern, minimal UI so gameplay remains the focus.
 
 -   Arcade Hub: responsive entry page with game previews and accessible "INSERT THE COIN" play buttons.
 -   Action Stations: grid-based battleships game, click or coordinate input, message log.
--   Duck 'Em Up: duck shooting game with multiple levels, rounds, score and overlays.
+-   Duck 'Em Up: duck shooting game with multiple levels, animations, rounds, score and overlays.
 -   Snake: classic snake with arrow keys and on-screen controls.
 -   Accessibility: ARIA labels, focus states for interactive controls.
 -   Modular assets: separate CSS/JS per game under `assets/` for maintainability.
@@ -126,7 +126,7 @@ Retro-arcade aesthetic with modern, minimal UI so gameplay remains the focus.
 
 ### Duck Em Up
 
-Duck 'Em Up is a fast-paced Duck Hunt–style browser shooter built with semantic HTML for overlays and HUD, modular CSS for visual styling and animations, and vanilla JavaScript for game logic and audio. Players click or tap ducks to shoot them, conserve bullets, and avoid misses - rounds are grouped into levels with progressive difficulty and simple physics for falling ducks.
+🦆 Duck 'Em Up is a fast-paced Duck Hunt–style browser shooter built with semantic HTML for overlays and HUD, modular CSS for visual styling and animations, and vanilla JavaScript for game logic and audio. Players click or tap ducks to shoot them, conserve bullets, and avoid misses - rounds are grouped into levels with progressive difficulty and simple physics for falling ducks.
 
 ![Duck 'Em Up Preview](assets/images/duck-em-up-preview.png)
 
@@ -168,7 +168,7 @@ Key implementation details:
 
 ### Action Stations
 
-Action Stations is a simplified clone of the classic game Battleship, depicting only one side of such a game. It was implemented as a single-page app and designed in such a way as to create the feeling of being in a cold-war era surface warship heading into combat, minimising the use of graphics and utilising a special pixel font to approximate the look of low-power computer systems of the era. Special attention was played to placing “environmental storytelling” elements on the game screen to allow the player to take a deeper dive into the game world without having this forced on them.
+⚓ Action Stations is a simplified clone of the classic game Battleship, depicting only one side of such a game. It was implemented as a single-page app and designed in such a way as to create the feeling of being in a cold-war era surface warship heading into combat, minimising the use of graphics and utilising a special pixel font to approximate the look of low-power computer systems of the era. Special attention was played to placing “environmental storytelling” elements on the game screen to allow the player to take a deeper dive into the game world without having this forced on them.
 
 ![Action Stations! Preview](assets/images/actionStations_gamePlay.png)
 
@@ -200,7 +200,7 @@ Key Implementation Details
     
 ### Snake
 
-Snake is a classic browser game built with **HTML**, **CSS**, and **JavaScript**, rendered on a 32×32 grid. Players control the snake with arrow keys (or on-screen buttons) to eat food, grow longer, and avoid colliding with walls or itself. The game demonstrates dynamic DOM manipulation, grid-based movement logic, modular architecture, and responsive design.
+🐍 Snake is a classic browser game built with **HTML**, **CSS**, and **JavaScript**, rendered on a 32×32 grid. Players control the snake with arrow keys (or on-screen buttons) to eat food, grow longer, and avoid colliding with walls or itself. The game demonstrates dynamic DOM manipulation, grid-based movement logic, modular architecture, and responsive design.
 
 ![Snake Preview](assets/images/snake-thumbnail.png)
 
@@ -252,6 +252,7 @@ Key implementation details:
 -   HTML5
 -   CSS3
 -   JavaScript (ES6+)
+-   Bootstrap 5
 -   Git & GitHub
 -   Visual Studio Code
 -   JSHint, W3C & Jigsaw validators
