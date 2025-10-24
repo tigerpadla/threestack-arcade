@@ -36,6 +36,60 @@ body {
     flex-direction: column;
 }
 
+/* Header: centered, responsive, above background video */
+.site-header {
+    position: relative;
+    z-index: 2; /* sits above the bg video */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 1rem 1rem;
+    pointer-events: auto;
+}
+
+.site-title {
+    margin: 0;
+    color: #e9fbff;
+    text-align: center;
+    font-family: "Sixtyfour", "Press Start 2P", system-ui, sans-serif;
+    /* responsive font: slightly larger across devices */
+    font-size: clamp(1.25rem, 5.5vw, 2.75rem);
+    line-height: 1;
+    letter-spacing: 0.08em;
+    /* layered text shadows for depth and legibility */
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85), 0 3px 8px rgba(0, 0, 0, 0.65),
+        0 0 14px rgba(0, 240, 255, 0.06);
+    /* subtle stroked outline for better contrast on bright backgrounds */
+    -webkit-text-stroke: 0.6px rgba(0, 0, 0, 0.6);
+    /* extra drop shadow via filter for browsers that support it */
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.45));
+}
+
+.site-subtitle {
+    margin: 0.35rem 0 0.8rem;
+    font-family: "Press Start 2P", "Sixtyfour", system-ui, sans-serif;
+    font-size: clamp(0.6rem, 2.5vw, 0.9rem);
+    color: #bfefff;
+    text-align: center;
+    letter-spacing: 0.06em;
+    line-height: 1.05;
+    z-index: 2;
+}
+
+@media (max-width: 480px) {
+    .site-header {
+        padding: 0.6rem 0.5rem;
+    }
+    .site-title {
+        /* mobile: make a bit larger for readability */
+        font-size: clamp(1rem, 8.5vw, 1.5rem);
+        padding: 0.2rem 0.45rem;
+        letter-spacing: 0.04em;
+    }
+}
+
 main {
     display: flex;
     flex: 1 1 auto; /* allow main to grow and occupy available vertical space */
@@ -59,15 +113,18 @@ main {
     flex-direction: row;
     gap: 2rem;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
     width: auto;
     max-width: 1100px;
     padding: 0 1rem;
+    flex-wrap: wrap; /* allow wrapping on smaller screens */
 }
 
 /* Ensure each card has a consistent size in the row */
 .game-card {
-    flex: 0 0 260px; /* fixed card width in the row */
+    /* flexible card that can shrink/grow; keeps a sensible max width */
+    flex: 1 1 260px; /* base width 260px, but flexible */
+    max-width: 320px;
     background: var(--bg-tone);
     border: 2px solid rgba(255, 255, 255, 0.04);
     padding: 1rem;
@@ -78,114 +135,157 @@ main {
     transition: transform 220ms ease, box-shadow 220ms ease;
     position: relative;
     overflow: hidden;
-}
+    .game-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--accent);
+        opacity: 0;
+        mix-blend-mode: screen;
+        transition: opacity 300ms ease;
+        pointer-events: none;
+    }
 
-.game-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--accent);
-    opacity: 0;
-    mix-blend-mode: screen;
-    transition: opacity 300ms ease;
-    pointer-events: none;
-}
+    .game-card:hover {
+        transform: translateY(-8px) scale(1.01);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7),
+            0 0 36px rgba(255, 45, 212, 0.08);
+    }
 
-.game-card:hover {
-    transform: translateY(-8px) scale(1.01);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7),
-        0 0 36px rgba(255, 45, 212, 0.08);
-}
+    .game-card:hover::before {
+        opacity: 1;
+    }
 
-.game-card:hover::before {
-    opacity: 1;
-}
-
-/* Thumbnail */
-.game-thumb {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 6px;
-    display: block;
-    margin-bottom: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-/* Title */
-.game-title {
-    font-size: 0.7rem;
-    color: #e6f7ff;
-    margin: 0 0 1rem 0;
-    letter-spacing: 0.08em;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
-}
-
-/* Play button */
-.play-btn {
-    display: inline-block;
-    padding: 0.9rem 1.2rem;
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.06),
-        rgba(0, 0, 0, 0.12)
-    );
-    color: var(--neon-c);
-    border: 2px solid rgba(0, 240, 255, 0.25);
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 0.65rem;
-    letter-spacing: 0.06em;
-    transition: transform 120ms ease, box-shadow 120ms ease, color 120ms ease;
-    box-shadow: 0 6px 18px rgba(0, 240, 255, 0.04);
-    cursor: pointer;
-}
-
-.play-btn:hover,
-.play-btn:focus {
-    transform: translateY(-3px);
-    color: var(--neon-p);
-    box-shadow: 0 10px 28px rgba(255, 45, 212, 0.12);
-    outline: none;
-}
-
-.play-btn:active,
-.play-btn.pressed {
-    transform: translateY(0) scale(0.995);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
-}
-
-/* Responsive tweaks */
-@media (max-width: 480px) {
+    /* Thumbnail */
     .game-thumb {
-        height: 110px;
+        width: 100%;
+        /* keep an aspect ratio so thumbnails scale nicely */
+        aspect-ratio: 16 / 9;
+        height: auto;
+        max-height: 220px; /* prevents extremely tall thumbnails on large screens */
+        object-fit: cover;
+        border-radius: 6px;
+        display: block;
+        margin-bottom: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.04);
     }
+
+    /* Title */
     .game-title {
-        font-size: 0.6rem;
+        font-size: 0.7rem;
+        color: #e6f7ff;
+        margin: 0 0 1rem 0;
+        letter-spacing: 0.08em;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
     }
+
+    /* Play button */
     .play-btn {
-        padding: 0.7rem 0.9rem;
-        font-size: 0.6rem;
+        display: inline-block;
+        padding: 0.9rem 1.2rem;
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.06),
+            rgba(0, 0, 0, 0.12)
+        );
+        color: var(--neon-c);
+        border: 2px solid rgba(0, 240, 255, 0.25);
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.65rem;
+        letter-spacing: 0.06em;
+        transition: transform 120ms ease, box-shadow 120ms ease,
+            color 120ms ease;
+        box-shadow: 0 6px 18px rgba(0, 240, 255, 0.04);
+        cursor: pointer;
     }
-}
 
-/* Responsive: wrap into rows / stack on smaller screens */
-@media (max-width: 880px) {
-    .game-card {
-        flex: 0 0 220px;
+    .play-btn:hover,
+    .play-btn:focus {
+        transform: translateY(-3px);
+        color: var(--neon-p);
+        box-shadow: 0 10px 28px rgba(255, 45, 212, 0.12);
+        outline: none;
     }
-    .game-grid {
-        gap: 1.25rem;
-    }
-}
 
-@media (max-width: 560px) {
-    .game-grid {
-        flex-wrap: wrap;
+    .play-btn:active,
+    .play-btn.pressed {
+        transform: translateY(0) scale(0.995);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Creator link: GitHub icon + name */
+    .creator {
+        margin-top: 0.9rem;
+        display: flex;
         justify-content: center;
     }
-    .game-card {
-        flex: 1 1 calc(50% - 1rem);
-        max-width: 100%;
+
+    .creator-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        text-decoration: none;
+        color: #bfefff;
+        transition: color 140ms ease, transform 120ms ease;
+    }
+
+    .creator-link:hover,
+    .creator-link:focus {
+        color: var(--neon-p);
+        transform: translateY(-2px);
+        outline: none;
+    }
+
+    .creator-icon {
+        width: 20px;
+        height: 20px;
+        display: block;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .creator-name {
+        font-size: 0.62rem;
+        letter-spacing: 0.06em;
+        font-family: "Press Start 2P", "Sixtyfour", system-ui, sans-serif;
+        white-space: nowrap;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 480px) {
+        .game-thumb {
+            /* slightly smaller max height on small devices */
+            aspect-ratio: 16 / 9;
+            max-height: 140px;
+        }
+        .game-title {
+            font-size: 0.6rem;
+        }
+        .play-btn {
+            padding: 0.7rem 0.9rem;
+            font-size: 0.6rem;
+        }
+    }
+
+    /* Responsive: wrap into rows / stack on smaller screens */
+    @media (max-width: 880px) {
+        .game-card {
+            flex: 0 0 220px;
+        }
+        .game-grid {
+            gap: 1.25rem;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .game-grid {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .game-card {
+            flex: 1 1 calc(50% - 1rem);
+            max-width: 100%;
+        }
     }
 }
