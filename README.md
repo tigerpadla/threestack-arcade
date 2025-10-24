@@ -170,7 +170,7 @@ Key implementation details:
 
 Action Stations is a simplified clone of the classic game Battleship, depicting only one side of such a game. It was implemented as a single-page app and designed in such a way as to create the feeling of being in a cold-war era surface warship heading into combat, minimising the use of graphics and utilising a special pixel font to approximate the look of low-power computer systems of the era. Special attention was played to placing “environmental storytelling” elements on the game screen to allow the player to take a deeper dive into the game world without having this forced on them.
 
-![assets/images/actionStations_gamePlay.png]
+![Action Stations! Preview](assets/images/actionStations_gamePlay.png)
 
 Key Implementation Details
 
