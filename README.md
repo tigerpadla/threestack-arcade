@@ -22,13 +22,17 @@
    - [Typography](#typography)  
    - [Imagery](#imagery)  
 4. [Features](#features)  
-   - [Existing Features (MVP)](#existing-features-mvp)  
-5. [Technologies Used](#technologies-used)  
-6. [Testing & Validation](#testing--validation)  
-7. [Deployment](#deployment)  
-8. [AI‑Assisted Development](#ai-assisted-development)  
-9. [Credits & License](#credits--license)  
-10. [Acknowledgements](#acknowledgements)
+   - [Existing Features (MVP)](#existing-features-mvp)
+5. [Mini-Games Overview](#mini-games-overview)  
+   - [Duck Em Up](#duck-em-up)
+   - [Action Stations](#action-stations)
+   - [Snake](#snake)
+6. [Technologies Used](#technologies-used)  
+7. [Testing & Validation](#testing--validation)  
+8. [Deployment](#deployment)  
+9. [AI‑Assisted Development](#ai-assisted-development)  
+10. [Credits & License](#credits--license)  
+11. [Acknowledgements](#acknowledgements)
 
 ---
 
@@ -112,6 +116,16 @@ Retro-arcade aesthetic with modern, minimal UI so gameplay remains the focus.
 
 ---
 
+## Mini-Games Overview
+
+### Duck Em Up
+
+### Action Stations
+
+### Snake
+
+---
+
 ## Technologies Used
 
 - HTML5 
@@ -152,9 +166,9 @@ AI accelerated iterations and documentation but final design, validation and dep
 
 ## Contributors
 
-- Maksym Karleichuk — Duck 'Em Up — https://github.com/tigerpadla  
-- Thomas Milde — Action Stations — https://github.com/thomil13  
-- Josh Cole — Snake — https://github.com/ColeiosCode
+- Maksym Karleichuk - Duck 'Em Up - https://github.com/tigerpadla  
+- Thomas Milde - Action Stations - https://github.com/thomil13  
+- Josh Cole- Snake - https://github.com/ColeiosCode
 
 ---
 
