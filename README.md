@@ -254,7 +254,7 @@ Key implementation details:
 -   JavaScript (ES6+)
 -   Git & GitHub
 -   Visual Studio Code
--   ESLint, W3C & Jigsaw validators
+-   JSHint, W3C & Jigsaw validators
 
 ---
 
@@ -262,8 +262,29 @@ Key implementation details:
 
 -   Responsiveness across devices
 -   Browser compatibility (Chrome, Firefox, Edge)
--   HTML & CSS validation
 -   Accessibility checks
+-   HTML & CSS validation
+-   JSHint validation:
+<details>
+<summary>Duck Em Up JS Validation</summary>
+
+![Duck Em Up](assets/images/duck-em-up-js-validation.png)
+
+</details>
+
+<details>
+<summary>Action Stations! JS Validation</summary>
+
+![Action Stations!](assets/images/action-stations-js-validation.png)
+
+</details>
+
+<details>
+<summary>Snake JS Validation</summary>
+
+![Snake](assets/images/snake-js-validation.png)
+
+</details>
 
 ---
 
