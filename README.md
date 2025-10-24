@@ -172,7 +172,8 @@ Action Stations is a simplified clone of the classic game Battleship, depicting 
 
 ![assets/images/actionStations_gamePlay.png]
 
-- Key Implementation Details
+Key Implementation Details
+
   - HTML
     - Three-column structure for game board, message log and environmental lore
     - 8x8 game board built using html table
@@ -181,9 +182,9 @@ Action Stations is a simplified clone of the classic game Battleship, depicting 
     - Inactive buttons included for environmental storytelling
 
   - JavaScript
-    - Main functions: constructor(), generateShips(), generateShipLocations(), fire(), guess(), processGuess(), displayHit(), displayMiss(), displayMessage()
-    - Math.random() & Math.floor() used to randomise ship position & orientation
-    - Gameplay loop: Clicking on game board or entering coordinates and pressing “Fire” button triggers game to check targeted cell ID against known cell ID of target ship. A hit triggers   displayHit() function which displays the appropriate icon on the map, while a miss triggers displayMiss(), which display the icon for a missed shot. Both functions in turn trigger   displayMessage(), which gives text feedback that is shown to player in Message Log.
+    - Main functions: `constructor()`, `generateShips()`, `generateShipLocations()`, `fire()`, `guess()`, `processGuess()`, `displayHit()`, `displayMiss()`, `displayMessage()`
+    - `Math.random()` & `Math.floor()` used to randomise ship position & orientation
+    - Gameplay loop: Clicking on game board or entering coordinates and pressing “Fire” button triggers game to check targeted cell ID against known cell ID of target ship. A hit triggers `displayHit()` function which displays the appropriate icon on the map, while a miss triggers `displayMiss()`, which display the icon for a missed shot. Both functions in turn trigger `displayMessage()`, which gives text feedback that is shown to player in Message Log.
     - Input: Mouse-based. Provision for keyboard input exists but requires further work
 
   - CSS
@@ -197,11 +198,6 @@ Action Stations is a simplified clone of the classic game Battleship, depicting 
     - Icons used to show hits and misses are drawn from NTDS (Navy Tactical Data System) symbology still used by navies of all NATO members as outlined in NATO STANAG 4420.
     - Use of inactive buttons to indicate inoperable systems, as well as flavour text in Modals are used to create a WW3 ambience and provide in-universe justification for simply shooting at grid squares.
     
--   Behaviour notes
-    -   Bullets are initialized each round as `bullets = duckCount + 1`; running out of bullets causes remaining `flying` ducks to flee (`flyingAway`) and counts as misses.
-    -   Shot ducks briefly show a `duck-shot` image then transition to `duck-fall` and fall with gravity.
-    -   Rounds and levels progress automatically; game over and completion overlays allow the player to restart.
-
 ### Snake
 
 Snake is a classic browser game built with **HTML**, **CSS**, and **JavaScript**, rendered on a 32×32 grid. Players control the snake with arrow keys (or on-screen buttons) to eat food, grow longer, and avoid colliding with walls or itself. The game demonstrates dynamic DOM manipulation, grid-based movement logic, modular architecture, and responsive design.
