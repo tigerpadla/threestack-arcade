@@ -1,4 +1,4 @@
-# 🎮 ThreeStack Arcade
+# ThreeStack Arcade 🎮
 
 ![ThreeStack Hero Banner](assets/images/three-stack-hero.png)
 
@@ -38,9 +38,9 @@
 
 ## Project Overview
 
-This project serves as a portfolio piece demonstrating proficiency in front‑end web development technologies. The goal was to build a polished, accessible, and fully responsive single‑page arcade hub that launches three mini‑games — each showcasing semantic HTML, modular CSS, and vanilla JavaScript focused on DOM manipulation, game loops, state management, and graceful error handling. 🎮
+This project serves as a portfolio piece demonstrating proficiency in front‑end web development technologies. The goal was to build a polished, accessible, and fully responsive single‑page arcade hub that launches three mini‑games each showcasing semantic HTML, modular CSS, and vanilla JavaScript focused on DOM manipulation, game loops, state management, and graceful error handling. 🎮
 
-The hub provides clear game previews, keyboard and touch‑friendly controls, persistent high score for Snake (localStorage), and a consistent visual design to guide users from discovery to gameplay. Game assets and code are organized into separate folders for maintainability and easy validation.
+The hub provides clear game previews, touch‑friendly controls and a consistent visual design to guide users from discovery to gameplay.
 
 ![Arcade Preview](assets/images/3-devices-preview.png)
 
@@ -100,7 +100,7 @@ Retro-arcade aesthetic with modern, minimal UI so gameplay remains the focus.
 
 ### Imagery
 
-- Pixel/retro icons, lightweight sprites and SVGs in `assets/images/` for crisp scaling and small footprint.
+- Pixel/retro icons, lightweight sprites in `assets/images/` for crisp scaling and small footprint.
 
 ---
 
@@ -112,7 +112,7 @@ Retro-arcade aesthetic with modern, minimal UI so gameplay remains the focus.
 - Action Stations: grid-based battleships game, click or coordinate input, message log.  
 - Duck 'Em Up: duck shooting game with multiple levels, rounds, score and overlays.  
 - Snake: classic snake with arrow keys and on-screen controls.  
-- Accessibility: ARIA labels, keyboard navigation, focus states for interactive controls.  
+- Accessibility: ARIA labels, focus states for interactive controls.  
 - Modular assets: separate CSS/JS per game under `assets/` for maintainability.
 
 ---
